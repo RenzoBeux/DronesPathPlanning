@@ -37,5 +37,5 @@ if __name__ =="__main__":
             uav.move()
     
     for uav in UAVList:
-        print(uav.moves)
+        print(uav.valuesArray())
     

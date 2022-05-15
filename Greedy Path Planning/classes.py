@@ -1,4 +1,17 @@
 from random import randint
+from enum import Enum
+
+class ACTION(Enum):
+    STAY = 0
+    RIGHT = 1
+    DIAG_DOWN_RIGHT = 2
+    DOWN = 3
+    DIAG_DOWN_LEFT = 4
+    LEFT = 5
+    DIAG_UP_LEFT = 6
+    UP = 7
+    DIAG_UP_RIGHT = 8 
+
 
 
 class coordObject:
@@ -39,23 +52,23 @@ class UAV:
         moveDown = self.position.y -1 >= 0
         moveLeft = self.position.x -1 >= 0
         moveUp = self.position.y +1 <= self.dims.y
-        result.append(0)
+        result.append(ACTION.STAY)
         if(moveRight):
-            result.append(1)
+            result.append(ACTION.RIGHT)
             if(moveDown):
-                result.append(2)
+                result.append(ACTION.DIAG_DOWN_RIGHT)
         if(moveDown):
-            result.append(3)
+            result.append(ACTION.DOWN)
             if(moveLeft):
-                result.append(4)
+                result.append(ACTION.DIAG_DOWN_LEFT)
         if(moveLeft):
-            result.append(5)
+            result.append(ACTION.LEFT)
             if(moveUp):
-                result.append(6)
+                result.append(ACTION.DIAG_UP_LEFT)
         if(moveUp):
-            result.append(7)
+            result.append(ACTION.UP)
             if(moveRight):
-                result.append(8)
+                result.append(ACTION.DIAG_UP_RIGHT)
         return result
 
     def setTarget(self,target:POI):
@@ -66,21 +79,21 @@ class UAV:
         targetCoords = target.getSection(self.dims)
         results = []
         if self.position.x < targetCoords.x:
-            results.append(1)
+            results.append(ACTION.RIGHT)
             if self.position.y < targetCoords.y:
-                results.append(2)
+                results.append(ACTION.DIAG_DOWN_RIGHT)
         if self.position.y > targetCoords.y:
-            results.append(3)
+            results.append(ACTION.DOWN)
             if self.position.x > targetCoords.x:
-                results.append(4)
+                results.append(ACTION.DIAG_DOWN_LEFT)
         if self.position.x > targetCoords.x:
-            results.append(5)
+            results.append(ACTION.LEFT)
             if self.position.y < targetCoords.y:
-                results.append(6)
+                results.append(ACTION.DIAG_UP_LEFT)
         if self.position.y < targetCoords.y:
-            results.append(7)
+            results.append(ACTION.UP)
             if self.position.x < targetCoords.x:
-                results.append(8)
+                results.append(ACTION.DIAG_UP_RIGHT)
         return results
 
     def move(self):
@@ -100,26 +113,26 @@ class UAV:
             self.moves.append(chosenMove)
 
     def shiftPosition(self,chosenMove):
-        if chosenMove == 0:
+        if chosenMove == ACTION.STAY:
             pass
-        elif chosenMove == 1:
+        elif chosenMove == ACTION.RIGHT:
             self.position.x = self.position.x + 1
-        elif chosenMove == 2:
+        elif chosenMove == ACTION.DIAG_DOWN_RIGHT:
             self.position.x = self.position.x + 1
             self.position.y = self.position.y - 1
-        elif chosenMove == 3:
+        elif chosenMove == ACTION.DOWN:
             self.position.y = self.position.y - 1
-        elif chosenMove == 4:
+        elif chosenMove == ACTION.DIAG_DOWN_LEFT:
             self.position.y = self.position.y - 1
             self.position.x = self.position.x - 1
-        elif chosenMove == 5:
+        elif chosenMove == ACTION.LEFT:
             self.position.x = self.position.x - 1
-        elif chosenMove == 6:
+        elif chosenMove == ACTION.DIAG_UP_LEFT:
             self.position.x = self.position.x - 1
             self.position.y = self.position.y + 1
-        elif chosenMove == 7:
+        elif chosenMove == ACTION.UP:
             self.position.y = self.position.y + 1
-        elif chosenMove == 8:
+        elif chosenMove == ACTION.DIAG_UP_RIGHT:
             self.position.y = self.position.y + 1
             self.position.x = self.position.x + 1
 
@@ -134,3 +147,9 @@ class UAV:
         if self.target == 0:
             return False
         return (self.position.x == self.target.getSection(self.dims).x) and (self.position.y == self.target.getSection(self.dims).y)
+    
+    def valuesArray(self):
+        values = []
+        for i in range(len(self.moves)):
+            values.append(self.moves[i].value)
+        return values
