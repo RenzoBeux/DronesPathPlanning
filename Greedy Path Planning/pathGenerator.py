@@ -1,5 +1,6 @@
 from constants import *
 from classes import *
+from utils import *
 from random import random, seed
 
 def generatePOICoord():
@@ -17,6 +18,7 @@ if __name__ =="__main__":
     POIList:list[POI] = []
     UAVList:list[UAV] = []
     needyPOI:list[POI] = []
+    printMapGrid(base,POIPosition)
     for i in range(POIAMOUNT):
         currPOI = POI(POIPosition[i],POITimes[i])
         POIList.append(currPOI)
@@ -35,7 +37,9 @@ if __name__ =="__main__":
                     uav.setTarget(poi)
         for uav in UAVList:
             uav.move()
+            printMapGrid(uav.position,POIPosition)
     
     for uav in UAVList:
+        print(list(map(lambda move: move.name,uav.moves)))
         print(uav.valuesArray())
     
