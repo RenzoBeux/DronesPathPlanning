@@ -1,7 +1,14 @@
-from classes import coordObject
+from enum import Enum
 
 
-DIM = coordObject(3,3)
-UAVAMOUNT = 1
-TIMELENGTH = 3
-POIAMOUNT = 1
+class ACTION(Enum):
+    STAY = 0
+    RIGHT = 1
+    DIAG_DOWN_RIGHT = 2
+    DOWN = 3
+    DIAG_DOWN_LEFT = 4
+    LEFT = 5
+    DIAG_UP_LEFT = 6
+    UP = 7
+    DIAG_UP_RIGHT = 8 
+
