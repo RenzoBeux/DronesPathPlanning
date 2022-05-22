@@ -1,10 +1,9 @@
-from constants import ACTION
+from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH, POIAMOUNT
 from random import randint, random, seed
-
-class coordObject:
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
+from coordObject import coordObject
+from POI import POI
+from heuristics.ImoveHeuristic import moveHeuristic
+from heuristics.nefesto import heuristic_nefesto
 
 def printMapGrid(dronePos:coordObject, POIPos):
     for aux in range(DIM.y):
@@ -34,99 +33,9 @@ def printMapGrid(dronePos:coordObject, POIPos):
                 print('_______', end='')
         print()
 
-DIM = coordObject(3,3)
-UAVAMOUNT = 1
-TIMELENGTH = 10
-POIAMOUNT = 1
 
-class POI:
-    def __init__(self,coords:coordObject,expectedVisitTime:int):
-        # coords is (x,y) pair of numbers in [0..1]
-        self.coords = coords
-        self.expectedVisitTime = expectedVisitTime
-        self.lastVisit = 0
 
-    def getSection(self,dim:coordObject)->coordObject:
-        percentageOfSectionX = dim.x * self.coords.x
-        percentageOfSectionY = dim.y * self.coords.y
-        sectionX = int(percentageOfSectionX)
-        sectionY = int(percentageOfSectionY)
-        result = coordObject(sectionX,sectionY)
-        return result
 
-    def markVisited(self,time):
-        self.lastVisit = time
-
-class moveHeuristic:
-    def getMove(self,parameters:list)->ACTION:
-        pass
-
-class heuristic01(moveHeuristic):
-    target = 0
-    free = True
-
-    def getMove(self,parameters)->ACTION:
-        # Parse parameters
-        time = parameters[0]
-        dim = parameters[1]
-        needyPOI:list[POI] = parameters[2]
-        position = parameters[3]
-        possibleMoves:list[ACTION] = parameters[4]
-        # Deal with target accordingly
-        if(self.isOnTarget(position,dim)):
-            self.removeTarget(time)
-        if(self.isFree() and len(needyPOI) > 0):
-            self.setTarget(needyPOI.pop())
-        # Chose move accordingly
-        if not self.isFree():
-            movesTowardsTarget:list[ACTION] = self.getMoveTowardsTarget(self.target.getSection(dim),dim)
-            probMoves = [*possibleMoves,*movesTowardsTarget]
-            randomNumber = randint(0,len(probMoves)-1)
-            chosenMove = probMoves[randomNumber]
-        else:
-            randomNumber = randint(0,len(possibleMoves)-1)
-            chosenMove = possibleMoves[randomNumber]
-        return chosenMove
-
-    def setTarget(self,target:POI):
-        self.free = False
-        self.target = target
-    
-    def removeTarget(self,time):
-        self.target.lastVisit = time
-        self.target = 0
-        self.free = True
-
-    def isOnTarget(self,position:coordObject,dim:coordObject):
-        if self.target == 0:
-            return False
-        targetCoords = self.target.getSection(dim)
-        result:bool = (targetCoords.x == position.x) and (targetCoords.y == position.y)
-        return result
-
-    def isFree(self)->bool:
-        return self.free
-
-    def getMoveTowardsTarget(self,position:coordObject,dims:coordObject)->list[ACTION]:
-        targetCoords:coordObject = self.target.getSection(dims)
-        results:list[ACTION] = []
-        if position.x < targetCoords.x:
-            results.append(ACTION.RIGHT)
-            if position.y > targetCoords.y:
-                results.append(ACTION.DIAG_DOWN_RIGHT)
-        if position.y > targetCoords.y:
-            results.append(ACTION.DOWN)
-            if position.x > targetCoords.x:
-                results.append(ACTION.DIAG_DOWN_LEFT)
-        if position.x > targetCoords.x:
-            results.append(ACTION.LEFT)
-            if position.y < targetCoords.y:
-                results.append(ACTION.DIAG_UP_LEFT)
-        if position.y < targetCoords.y:
-            results.append(ACTION.UP)
-            if position.x < targetCoords.x:
-                results.append(ACTION.DIAG_UP_RIGHT)
-        return results
 
 class UAV:
 
@@ -223,7 +132,7 @@ if __name__ =="__main__":
         POIList.append(currPOI)
         needyPOI.append(currPOI)
     for i in range(UAVAMOUNT):
-        currUAV = UAV(dims,base,heuristic01())
+        currUAV = UAV(dims,base,heuristic_nefesto())
         UAVList.append(currUAV)
     # Creation of the routes
     for t in range(TIMELENGTH):

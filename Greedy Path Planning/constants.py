@@ -1,5 +1,10 @@
 from enum import Enum
+from coordObject import coordObject
 
+DIM = coordObject(3,3)
+UAVAMOUNT = 1
+TIMELENGTH = 10
+POIAMOUNT = 1
 
 class ACTION(Enum):
     STAY = 0
@@ -12,3 +17,6 @@ class ACTION(Enum):
     UP = 7
     DIAG_UP_RIGHT = 8 
 
+
+P_SUCC = 0.8
+P_FAIL = 0.2 
