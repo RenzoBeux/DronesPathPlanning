@@ -1,11 +1,12 @@
 from coordObject import coordObject
 
 class POI:
-    def __init__(self,coords:coordObject,expectedVisitTime:int):
+    def __init__(self,coords:coordObject,expectedVisitTime:int, id:int):
         # coords is (x,y) pair of numbers in [0..1]
         self.coords = coords
         self.expectedVisitTime = expectedVisitTime
         self.lastVisit = 0
+        self.id = id
 
     def getSection(self,dim:coordObject)->coordObject:
         percentageOfSectionX = dim.x * self.coords.x

@@ -1,25 +1,30 @@
+from POI import POI
 from coordObject import coordObject
 from heuristics.ImoveHeuristic import moveHeuristic
 from constants import *
- 
+
 
 class UAV:
 
-    def __init__(self,dims:coordObject,base:coordObject,heuristic:moveHeuristic):
+    def __init__(self, dims: coordObject, base: coordObject, heuristic: moveHeuristic, id: int):
         self.dims = dims
         self.position = base
         self.free = True
         self.moves = []
-        self.target = 0
         self.moveHeuristic = heuristic
+        self.id = id
 
+    def getTarget(self):
+        if (self.moveHeuristic.target == None):
+            return POI(coordObject(0, 0), 0, -1)
+        return self.moveHeuristic.target
 
     def possibleMoves(self):
         result = []
         moveRight = self.position.x + 1 < self.dims.x
-        moveDown = self.position.y -1 >= 0
-        moveLeft = self.position.x -1 >= 0
-        moveUp = self.position.y +1 < self.dims.y
+        moveDown = self.position.y - 1 >= 0
+        moveLeft = self.position.x - 1 >= 0
+        moveUp = self.position.y + 1 < self.dims.y
         result.append(ACTION.STAY)
         if(moveRight):
             result.append(ACTION.RIGHT)
@@ -39,14 +44,15 @@ class UAV:
                 result.append(ACTION.DIAG_UP_RIGHT)
         return result
 
-    def move(self,parameters:list[any]):
+    def move(self, parameters: list[any]):
         parameters.append(self.position)
         parameters.append(self.possibleMoves())
-        move = self.moveHeuristic.getMove(parameters)
+        move, needyPOI = self.moveHeuristic.getMove(parameters)
         self.shiftPosition(move)
         self.moves.append(move)
+        return needyPOI
 
-    def shiftPosition(self,chosenMove:ACTION):
+    def shiftPosition(self, chosenMove: ACTION):
         if chosenMove == ACTION.STAY:
             pass
         elif chosenMove == ACTION.RIGHT:
@@ -69,7 +75,7 @@ class UAV:
         elif chosenMove == ACTION.DIAG_UP_RIGHT:
             self.position.y = self.position.y + 1
             self.position.x = self.position.x + 1
-    
+
     def valuesArray(self):
         values = []
         for i in range(len(self.moves)):

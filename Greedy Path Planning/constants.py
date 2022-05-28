@@ -1,10 +1,9 @@
 from enum import Enum
 from coordObject import coordObject
 
-DIM = coordObject(3,3)
-UAVAMOUNT = 1
+DIM = coordObject(5,5)
+UAVAMOUNT = 2
 TIMELENGTH = 10
-POIAMOUNT = 1
 
 class ACTION(Enum):
     STAY = 0

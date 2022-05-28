@@ -1,40 +1,12 @@
-from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH, POIAMOUNT
-from random import randint, random, seed
+from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH
+from random import randint, random, seed, shuffle
 from coordObject import coordObject
 from POI import POI
 from UAV import UAV
 from heuristics.ImoveHeuristic import moveHeuristic
 from heuristics.nefesto import heuristic_nefesto
-
-
-def printMapGrid(dronePos: coordObject, POIPos):
-    for aux in range(DIM.y):
-        if aux == 0:
-            for x in range(DIM.x):
-                print('_______', end='')
-        print()
-        print()
-        print('|    ', end='')
-        # to print it in right order
-        y = DIM.y - aux - 1
-        for x in range(DIM.x):
-            isPOI = [coords for coords in POIPos if (
-                coords.x == x and coords.y == y)] != []
-            isDrone = x == dronePos.x and y == dronePos.y
-            if(isDrone):
-                print('D', end='')
-            if(isPOI):
-                print('P', end='')
-            if(not isPOI and not isDrone):
-                print('-', end='')
-            # prints a tab
-            print('    ', end='')
-        print('|', end='')
-        print('')
-        if aux+1 == DIM.y:
-            for x in range(DIM.x):
-                print('_______', end='')
-        print()
+from heuristics.ades import heuristic_ades
+from utils import *
 
 
 def generatePOICoord():
@@ -45,34 +17,49 @@ def generatePOICoord():
 
 if __name__ == "__main__":
     # seed(0)
-    base = coordObject(0, 0)
     dims = DIM
     amountOfUAV = UAVAMOUNT
-    POIPosition = [coordObject(0.5, 0.5)]
-    POITimes = [10]
+    POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
+    POITimes = [2, 5]
     POIList: list[POI] = []
     UAVList: list[UAV] = []
     needyPOI: list[POI] = []
-    printMapGrid(base, POIPosition)
     # POI and UAV creation
-    for i in range(POIAMOUNT):
-        currPOI = POI(POIPosition[i], POITimes[i])
+    for i in range(len(POIPosition)):
+        currPOI = POI(POIPosition[i], POITimes[i], i)
         POIList.append(currPOI)
         needyPOI.append(currPOI)
     for i in range(UAVAMOUNT):
-        currUAV = UAV(dims, base, heuristic_nefesto())
+        currUAV = UAV(dims, coordObject(0, 0), heuristic_ades(), i)
         UAVList.append(currUAV)
+    printMapGrid(UAVList, list(
+        map(lambda poi: poi.getSection(dims), POIList)))
+
+    # add randomness to UAV picking POIs
+    shuffle(UAVList)
     # Creation of the routes
     for t in range(TIMELENGTH):
         print(UAVList[0].position.x, ' ', UAVList[0].position.y)
         for poi in POIList:
-            if (not(poi in needyPOI) and (t - poi.lastVisit > poi.expectedVisitTime)):
-                needyPOI.append()
+            flag = True
+            for uav in UAVList:
+                if (uav.getTarget().id == poi.id):
+                    flag = False
+            if (flag and not(poi in needyPOI) and (t - poi.lastVisit > poi.expectedVisitTime)):
+                needyPOI.append(poi)
         for uav in UAVList:
-            uav.move([t, dims, needyPOI])
-            printMapGrid(uav.position, list(
-                map(lambda poi: poi.getSection(dims), POIList)))
+            needyPOI = uav.move([t, dims, needyPOI])
+            print("------------" + str(uav.id) + "------------")
+            print(list(map(lambda move: move.name, uav.moves)))
+            print(uav.getTarget().id)
+            print("------------------------")
 
+        printMapGrid(UAVList, list(
+            map(lambda poi: poi.getSection(dims), POIList)))
+
+    # i want the table to be sorted at the end
+    UAVList.sort(key=lambda x: x.id)
     for uav in UAVList:
+        print(uav.id)
         print(list(map(lambda move: move.name, uav.moves)))
-        print(uav.valuesArray())
+        # print(uav.valuesArray())

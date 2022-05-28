@@ -6,7 +6,7 @@ from constants import *
 from random import randint
 
 #moves always to the point
-class heuristic_nefesto(moveHeuristic):
+class heuristic_ades(moveHeuristic):
     target = None
     free = True
 
