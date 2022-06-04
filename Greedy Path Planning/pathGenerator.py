@@ -24,7 +24,7 @@ def saveMap(map, id):
 
 
 def runGreedy(id):
-    # seed(0)
+    seed(id)
     dims = DIM
     amountOfUAV = UAVAMOUNT
     POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
@@ -49,14 +49,14 @@ def runGreedy(id):
     for t in range(TIMELENGTH):
         # print(UAVList[0].position.x, ' ', UAVList[0].position.y)
         for poi in POIList:
-            flag=True
+            flag = True
             for uav in UAVList:
                 if (uav.getTarget().id == poi.id):
-                    flag=False
+                    flag = False
             if (flag and not(poi in needyPOI) and (t - poi.lastVisit > poi.expectedVisitTime)):
                 needyPOI.append(poi)
         for uav in UAVList:
-            needyPOI=uav.move([t, dims, needyPOI])
+            needyPOI = uav.move([t, dims, needyPOI])
             # print("------------" + str(uav.id) + "------------")
             # print(list(map(lambda move: move.name, uav.moves)))
             # print(uav.getTarget().id)
@@ -66,7 +66,7 @@ def runGreedy(id):
             map(lambda poi: poi.getSection(dims), POIList)))
 
     # i want the table to be sorted at the end
-    UAVList.sort(key = lambda x: x.id)
+    UAVList.sort(key=lambda x: x.id)
     res = []
     for uav in UAVList:
         # print(uav.id)
