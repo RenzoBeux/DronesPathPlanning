@@ -3,7 +3,7 @@ from coordObject import coordObject
 from POI import POI
 from constants import *
 
-from random import randint
+from random import randint, choices
 
 #moves always to the point
 class heuristic_nefesto(moveHeuristic):
@@ -28,11 +28,13 @@ class heuristic_nefesto(moveHeuristic):
                 position, dim)
             posible = [*possibleMoves]
             targetMoves = [*movesTowardsTarget]
-            if (len(targetMoves)-1 > 0):
-                randomNumber = randint(0, len(targetMoves)-1)
+            choiceList = choices([targetMoves,posible], [P_SUCC, 1-P_SUCC])
+            choice =  choiceList[0]
+            if (len(choice)-1 > 0):
+                randomNumber = randint(0, len(choice)-1)
             else:
                 randomNumber = 0
-            chosenMove = targetMoves[randomNumber]
+            chosenMove = choice[randomNumber]
         else:
             randomNumber = randint(0, len(possibleMoves)-1)
             chosenMove = possibleMoves[randomNumber]
