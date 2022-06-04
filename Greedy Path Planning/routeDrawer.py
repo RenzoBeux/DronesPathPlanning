@@ -6,6 +6,23 @@ from POI import POI
 colors = ['b','g','r','c','m','k']
 markers = ['o','^','v']
 
+def calculateOffset(index):
+    result = coordObject(0,0)
+    if(index % 4 == 0):
+        result.x = 0.1
+        result.y = 0.1
+    elif(index % 4 == 1):
+        result.x = 0.1
+        result.y = -0.2
+    elif(index % 4 == 2):
+        result.x = -0.1
+        result.y = -0.2
+    else:
+        result.x = -0.1
+        result.y = 0.1
+    return result
+    
+
 def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes:list[list[ACTION]]):
   plt.figure()
   plt.xlim(-0.3,dimensions.x+0.3)
@@ -21,6 +38,7 @@ def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes
     position = coordObject(origin.x,origin.y)
     xCoordenates = []
     yCoordenates = []
+    offset = calculateOffset(index)
     for moveIndex,move in enumerate(route):
         xCoordenates.append(position.x)
         yCoordenates.append(position.y)
@@ -35,7 +53,7 @@ def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes
                 while route[moveIndex + i] == ACTION.STAY:
                     acc += 1
                     i += 1
-                plt.annotate(acc,(position.x+0.1,position.y+0.1))
+                plt.annotate(acc,(position.x+offset.x,position.y+offset.y),color=colors[index])
         plt.plot(xCoordenates,yCoordenates,color=colors[index])
         plt.pause(1)
         tempPos.remove()
