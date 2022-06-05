@@ -87,8 +87,19 @@ def yDelta(move:ACTION):
 def mapFun(coord:coordObject):
     return POI(coord,0,0)
 
+def readFileAction(fileName):
+    file = open(fileName,'r')
+    lines = file.readlines()
+    file.close()
+    result = []
+    for line in lines:
+        line = line.replace('\n','')
+        result.append(list(map(lambda x:ACTION[x],line.split(' '))))
+    return result
+
 if __name__ == '__main__':
-    routes = [[ACTION.UP,ACTION.STAY,ACTION.STAY,ACTION.RIGHT,ACTION.RIGHT,ACTION.DOWN,ACTION.RIGHT,ACTION.STAY,ACTION.DIAG_UP_RIGHT],[ACTION.UP,ACTION.STAY,ACTION.RIGHT,ACTION.UP,ACTION.UP]]
+    routes = readFileAction('1.txt')
+    # routes = [[ACTION.UP,ACTION.STAY,ACTION.STAY,ACTION.RIGHT,ACTION.RIGHT,ACTION.DOWN,ACTION.RIGHT,ACTION.STAY,ACTION.DIAG_UP_RIGHT],[ACTION.UP,ACTION.STAY,ACTION.RIGHT,ACTION.UP,ACTION.UP]]
     coordPoi = [coordObject(0.8,0.5),coordObject(0.75,0.9),coordObject(0.9,0)]
     poi = list(map(mapFun,coordPoi))
     dimensions = coordObject(5,5)

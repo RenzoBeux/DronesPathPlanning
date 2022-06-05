@@ -62,15 +62,15 @@ def runGreedy(id):
             # print(uav.getTarget().id)
             # print("------------------------")
 
-        printMapGrid(UAVList, list(
-            map(lambda poi: poi.getSection(dims), POIList)))
+        # printMapGrid(UAVList, list(
+        #     map(lambda poi: poi.getSection(dims), POIList)))
 
     # i want the table to be sorted at the end
     UAVList.sort(key=lambda x: x.id)
     res = []
     for uav in UAVList:
         # print(uav.id)
-        res.append(list(map(lambda move: move.name, uav.moves)))
+        res.append(list(map(lambda move: str(move.name), uav.moves)))
         # print(list(map(lambda move: move.name, uav.moves)))
         # print(uav.valuesArray())
     saveMap(res, id)
