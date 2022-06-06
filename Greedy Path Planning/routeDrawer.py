@@ -63,6 +63,32 @@ def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes
   plt.show()
   return 0
 
+def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes:list[list[ACTION]]):
+    plt.figure()
+    plt.xlim(-0.3,dimensions.x+0.3)
+    plt.ylim(-0.3,dimensions.y+0.3)
+    plt.grid(True)
+    
+    for poi in Pois:
+        x = poi.getSection(dimensions).x
+        y = poi.getSection(dimensions).y
+        plt.plot(x,y,marker='o',color='k')
+
+    positions = map(routes,coordObject(origin.x,origin.y))
+    
+    time = max(map(len,routes))
+    moveStart = coordObject(origin.x,origin.y)
+    moveEnd = coordObject(origin.x,origin.y)
+    for t in range(time):
+        for index,route in enumerate(routes):
+            if t < len(route):
+                move = route[t]
+                moveStart.x = positions[index].x
+                moveStart.y = positions[index].y
+                moveEnd.x = moveStart.x + xDelta(move)
+                moveEnd.y = moveStart.y + yDelta(move)
+                
+
 
 def xDelta(move:ACTION):
     positives = [ACTION.DIAG_DOWN_RIGHT,ACTION.RIGHT,ACTION.DIAG_UP_RIGHT]
@@ -99,7 +125,6 @@ def readFileAction(fileName):
 
 if __name__ == '__main__':
     routes = readFileAction('1.txt')
-    # routes = [[ACTION.UP,ACTION.STAY,ACTION.STAY,ACTION.RIGHT,ACTION.RIGHT,ACTION.DOWN,ACTION.RIGHT,ACTION.STAY,ACTION.DIAG_UP_RIGHT],[ACTION.UP,ACTION.STAY,ACTION.RIGHT,ACTION.UP,ACTION.UP]]
     coordPoi = [coordObject(0.8,0.5),coordObject(0.75,0.9),coordObject(0.9,0)]
     poi = list(map(mapFun,coordPoi))
     dimensions = coordObject(5,5)
