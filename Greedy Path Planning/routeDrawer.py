@@ -7,6 +7,9 @@ colors = ['b','g','r','c','m','k']
 markers = ['o','^','v']
 
 def calculateOffset(index):
+    """
+    Returns an offset for shifting an annotation when representing a UAV executing ACTION.STAY
+    """
     result = coordObject(0,0)
     if(index % 4 == 0):
         result.x = 0.1
@@ -24,6 +27,9 @@ def calculateOffset(index):
     
 
 def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes:list[list[ACTION]]):
+  """
+  Graphs using pyplot the trajectories of each UAV, in the order of the routes.
+  """
   plt.figure()
   plt.xlim(-0.3,dimensions.x+0.3)
   plt.ylim(-0.3,dimensions.y+0.3)
@@ -50,7 +56,7 @@ def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes
             if  moveIndex ==0 or route[moveIndex-1] != ACTION.STAY:
                 acc = 1
                 i = 1
-                while route[moveIndex + i] == ACTION.STAY:
+                while moveIndex+i in range(len(route)) and route[moveIndex + i] == ACTION.STAY:
                     acc += 1
                     i += 1
                 plt.annotate(acc,(position.x+offset.x,position.y+offset.y),color=colors[index])
@@ -64,6 +70,9 @@ def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes
   return 0
 
 def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes:list[list[ACTION]]):
+    """
+    Graphs using pyplot the trajectories of the UAVs, graphins simultaneosly each move of each drone
+    """
     plt.figure()
     plt.xlim(-0.3,dimensions.x+0.3)
     plt.ylim(-0.3,dimensions.y+0.3)
@@ -74,23 +83,48 @@ def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, rou
         y = poi.getSection(dimensions).y
         plt.plot(x,y,marker='o',color='k')
 
-    positions = map(routes,coordObject(origin.x,origin.y))
+    positions = [coordObject(origin.x,origin.y) for _ in routes] 
     
     time = max(map(len,routes))
     moveStart = coordObject(origin.x,origin.y)
     moveEnd = coordObject(origin.x,origin.y)
+    tempPos = []
     for t in range(time):
         for index,route in enumerate(routes):
+            offset = calculateOffset(index)
             if t < len(route):
                 move = route[t]
                 moveStart.x = positions[index].x
                 moveStart.y = positions[index].y
                 moveEnd.x = moveStart.x + xDelta(move)
                 moveEnd.y = moveStart.y + yDelta(move)
+                positions[index].x = moveEnd.x
+                positions[index].y = moveEnd.y
+                tempPos.append(plt.scatter(moveEnd.x,moveEnd.y,marker=markers[index],color=colors[index],s=100))
+                if move == ACTION.STAY:
+                    plt.scatter(moveEnd.x,moveEnd.y,s=80,facecolors='none',edgecolors=colors[index])
+                    if  t == 0 or t not in range(len(route)) or route[t-1] != ACTION.STAY:
+                        acc = 1
+                        i = 1
+                        while t+i in range(len(route)) and route[t + i] == ACTION.STAY:
+                            acc += 1
+                            i += 1
+                        plt.annotate(acc,(moveEnd.x+offset.x,moveEnd.y+offset.y),color=colors[index])
+                plt.plot([moveStart.x,moveEnd.x],[moveStart.y,moveEnd.y],color=colors[index])
+
+        plt.pause(1)
+        for temp in tempPos:
+            temp.remove()
+        tempPos.clear()
+    plt.show()
+
                 
 
 
 def xDelta(move:ACTION):
+    """
+    Calculates the shift an ACTION produces in the X axis
+    """
     positives = [ACTION.DIAG_DOWN_RIGHT,ACTION.RIGHT,ACTION.DIAG_UP_RIGHT]
     negatives = [ACTION.DIAG_DOWN_LEFT,ACTION.LEFT, ACTION.DIAG_UP_LEFT]
     if move in positives:
@@ -101,6 +135,9 @@ def xDelta(move:ACTION):
         return 0
 
 def yDelta(move:ACTION):
+    """
+    Calculates the shift an ACTION produces in the Y axis
+    """
     positives = [ACTION.DIAG_UP_RIGHT,ACTION.DIAG_UP_LEFT,ACTION.UP]
     negatives = [ACTION.DIAG_DOWN_RIGHT,ACTION.DIAG_DOWN_LEFT, ACTION.DOWN]
     if move in positives:
@@ -114,6 +151,9 @@ def mapFun(coord:coordObject):
     return POI(coord,0,0)
 
 def readFileAction(fileName):
+    """
+    Reads a file and interprets it as a list of sequences of ACTIONs
+    """
     file = open(fileName,'r')
     lines = file.readlines()
     file.close()
@@ -129,4 +169,4 @@ if __name__ == '__main__':
     poi = list(map(mapFun,coordPoi))
     dimensions = coordObject(5,5)
     origin = coordObject(0,0)
-    drawRoute(dimensions,poi,origin,routes)
+    drawRouteAlt(dimensions,poi,origin,routes)
