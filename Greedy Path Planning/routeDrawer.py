@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from coordObject import coordObject
 from constants import ACTION
 from POI import POI
+from utils import readFileAction
 
 colors = ['b','g','r','c','m','k']
 markers = ['o','^','v']
@@ -25,7 +26,6 @@ def calculateOffset(index):
         result.y = 0.1
     return result
     
-
 def drawRoute(dimensions:coordObject, Pois:list[POI], origin:coordObject, routes:list[list[ACTION]]):
   """
   Graphs using pyplot the trajectories of each UAV, in the order of the routes.
@@ -79,11 +79,11 @@ def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, rou
     plt.grid(True)
     
     for poi in Pois:
-        x = poi.getSection(dimensions).x
-        y = poi.getSection(dimensions).y
+        x = poi.getSection(dimensions).x + 0.5
+        y = poi.getSection(dimensions).y + 0.5
         plt.plot(x,y,marker='o',color='k')
 
-    positions = [coordObject(origin.x,origin.y) for _ in routes] 
+    positions = [coordObject(origin.x + 0.5,origin.y + 0.5) for _ in routes] 
     
     time = max(map(len,routes))
     moveStart = coordObject(origin.x,origin.y)
@@ -112,14 +112,11 @@ def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, rou
                         plt.annotate(acc,(moveEnd.x+offset.x,moveEnd.y+offset.y),color=colors[index])
                 plt.plot([moveStart.x,moveEnd.x],[moveStart.y,moveEnd.y],color=colors[index])
 
-        plt.pause(1)
+        plt.pause(0.2)
         for temp in tempPos:
             temp.remove()
         tempPos.clear()
     plt.show()
-
-                
-
 
 def xDelta(move:ACTION):
     """
@@ -150,18 +147,9 @@ def yDelta(move:ACTION):
 def mapFun(coord:coordObject):
     return POI(coord,0,0)
 
-def readFileAction(fileName):
-    """
-    Reads a file and interprets it as a list of sequences of ACTIONs
-    """
-    file = open(fileName,'r')
-    lines = file.readlines()
-    file.close()
-    result = []
-    for line in lines:
-        line = line.replace('\n','')
-        result.append(list(map(lambda x:ACTION[x],line.split(' '))))
-    return result
+def interpretFile(name:str,poi:list[POI]=[],dimensions:coordObject=coordObject(5,5),origin:coordObject=coordObject(0,0)):
+    routes = readFileAction(name)
+    drawRouteAlt(dimensions,poi,origin,routes)
 
 if __name__ == '__main__':
     routes = readFileAction('1.txt')
