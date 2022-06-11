@@ -2,5 +2,6 @@ from pathGenerator import runGreedy
 
 
 if __name__ == "__main__":
-    for i in range(1, 100):
-        runGreedy(i)
+    for k in range(70,100):
+        for i in range(1, 10):
+            runGreedy(i,k/100)

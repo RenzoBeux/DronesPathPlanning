@@ -17,5 +17,3 @@ class ACTION(Enum):
     UP = 7
     DIAG_UP_RIGHT = 8
 
-
-P_SUCC = 0.8

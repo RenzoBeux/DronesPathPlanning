@@ -1,3 +1,4 @@
+import os
 from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH
 from random import randint, random, seed, shuffle
 from coordObject import coordObject
@@ -16,14 +17,21 @@ def generatePOICoord():
 
 
 # this function saves into a txt file an array of arrays of strings
-def saveMap(map, id):
-    file = open("output/" + str(id) + ".txt", "w")
+def saveMap(map, id, successProbability):
+    # create a folder inside output/
+    if not os.path.exists('output/'):
+        os.makedirs('output/')
+    # create a folder inside output/id/
+    if not os.path.exists('output/' + str(int(successProbability*100))):
+        os.makedirs('output/' + str(int(successProbability*100)))
+    file = open("output/" + str(int(successProbability*100)) +
+                "/" + str(id) + ".txt", "w")
     for line in map:
         file.write(" ".join(line) + "\n")
     file.close()
 
 
-def runGreedy(id):
+def runGreedy(id, successProbability):
     seed(id)
     dims = DIM
     amountOfUAV = UAVAMOUNT
@@ -38,7 +46,8 @@ def runGreedy(id):
         POIList.append(currPOI)
         needyPOI.append(currPOI)
     for i in range(UAVAMOUNT):
-        currUAV = UAV(dims, coordObject(0, 0), heuristic_nefesto(), i)
+        currUAV = UAV(dims, coordObject(0, 0),
+                      heuristic_nefesto(successProbability), i)
         UAVList.append(currUAV)
     # printMapGrid(UAVList, list(
         # map(lambda poi: poi.getSection(dims), POIList)))
@@ -70,7 +79,7 @@ def runGreedy(id):
     res = []
     for uav in UAVList:
         # print(uav.id)
-        res.append(list(map(lambda move: move.name, uav.moves)))
+        res.append(list(map(lambda move: str(move.value), uav.moves)))
         # print(list(map(lambda move: move.name, uav.moves)))
         # print(uav.valuesArray())
-    saveMap(res, id)
+    saveMap(res, id, successProbability)

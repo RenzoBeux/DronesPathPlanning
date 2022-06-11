@@ -5,17 +5,23 @@ from constants import *
 
 from random import randint, choices
 
-#moves always to the point
+# moves always to the point
+
+
 class heuristic_nefesto(moveHeuristic):
     target = None
     free = True
+    succProb = 0
+
+    def __init__(self, succProb):
+        self.succProb = succProb
 
     def getMove(self, parameters) -> ACTION:
         # Parse parameters
         time = parameters[0]
         dim = parameters[1]
         needyPOI: list[POI] = parameters[2]
-        position:coordObject = parameters[3]
+        position: coordObject = parameters[3]
         possibleMoves: list[ACTION] = parameters[4]
         # Deal with target accordingly
         if(self.isOnTarget(position, dim)):
@@ -28,8 +34,9 @@ class heuristic_nefesto(moveHeuristic):
                 position, dim)
             posible = [*possibleMoves]
             targetMoves = [*movesTowardsTarget]
-            choiceList = choices([targetMoves,posible], [P_SUCC, 1-P_SUCC])
-            choice =  choiceList[0]
+            choiceList = choices([targetMoves, posible], [
+                                 self.succProb, 1-self.succProb])
+            choice = choiceList[0]
             if (len(choice)-1 > 0):
                 randomNumber = randint(0, len(choice)-1)
             else:
@@ -65,7 +72,7 @@ class heuristic_nefesto(moveHeuristic):
     def getMoveTowardsTarget(self, position: coordObject, dims: coordObject) -> list[ACTION]:
         targetCoords: coordObject = self.target.getSection(dims)
         results: list[ACTION] = []
-        #if im on target the return stay
+        # if im on target the return stay
         if(self.isOnTarget(position, dims)):
             results.append(ACTION.STAY)
             return results
