@@ -7,6 +7,7 @@ BIGDIM = coordObject(18,18)
 UAVAMOUNT = 2
 TIMELENGTH = 100
 
+PAUSE_TIME = 0.2
 
 class ACTION(Enum):
     STAY = 0

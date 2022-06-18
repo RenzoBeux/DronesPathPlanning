@@ -1,5 +1,5 @@
 import os
-from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH
+from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH, BIGDIM
 from random import randint, random, seed, shuffle
 from coordObject import coordObject
 from POI import POI
@@ -33,7 +33,7 @@ def saveMap(map, id, successProbability):
 
 def runGreedy(id, successProbability):
     seed(id)
-    dims = DIM
+    dims = BIGDIM
     amountOfUAV = UAVAMOUNT
     POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
     POITimes = [2, 5]

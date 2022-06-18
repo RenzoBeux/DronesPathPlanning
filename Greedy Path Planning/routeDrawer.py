@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 from coordObject import coordObject
-from constants import ACTION, BIGDIM
+from constants import ACTION, BIGDIM, DIM, PAUSE_TIME
 from POI import POI
+from utils import readFileAction
 
 colors = ['b', 'g', 'r', 'c', 'm', 'k']
 markers = ['o', '^', 'v']
@@ -25,16 +26,6 @@ def calculateOffset(index):
         result.x = -0.1
         result.y = 0.1
     return result
-
-
-def drawRoute(dimensions: coordObject, Pois: list[POI], origin: coordObject, routes: list[list[ACTION]]):
-    """
-    Graphs using pyplot the trajectories of each UAV, in the order of the routes.
-    """
-    plt.figure()
-    plt.xlim(-0.3, dimensions.x+0.3)
-    plt.ylim(-0.3, dimensions.y+0.3)
-    plt.grid(True)
 
 
 def drawRoute(dimensions: coordObject, Pois: list[POI], origin: coordObject, routes: list[list[ACTION]]):
@@ -75,7 +66,7 @@ def drawRoute(dimensions: coordObject, Pois: list[POI], origin: coordObject, rou
                     plt.annotate(acc, (position.x+offset.x,
                                  position.y+offset.y), color=colors[index])
             plt.plot(xCoordenates, yCoordenates, color=colors[index])
-            plt.pause(1)
+            plt.pause(PAUSE_TIME)
             tempPos.remove()
         xCoordenates.append(position.x)
         yCoordenates.append(position.y)
@@ -93,6 +84,9 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
     plt.xlim(-0.3,dimensions.x + 0.3)
     plt.ylim(-0.3,dimensions.y + 0.3)
     plt.grid(True)
+    ticks = [t for t in range(dimensions.x)]
+    plt.xticks(ticks=ticks)
+    plt.yticks(ticks=ticks)
 
     for poi in Pois:
         x = poi.getSection(dimensions).x + 0.5
@@ -131,7 +125,7 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
                 plt.plot([moveStart.x, moveEnd.x], [
                          moveStart.y, moveEnd.y], color=colors[index])
 
-        plt.pause(0.2)
+        plt.pause(PAUSE_TIME)
         for temp in tempPos:
             temp.remove()
         tempPos.clear()
