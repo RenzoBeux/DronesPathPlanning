@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from coordObject import coordObject
-from constants import ACTION
+from constants import ACTION, BIGDIM
 from POI import POI
 from utils import readFileAction
 
@@ -74,8 +74,9 @@ def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, rou
     Graphs using pyplot the trajectories of the UAVs, graphins simultaneosly each move of each drone
     """
     plt.figure()
-    plt.xlim(-0.3,dimensions.x+0.3)
-    plt.ylim(-0.3,dimensions.y+0.3)
+    print(dimensions.x)
+    plt.xlim(-0.3,dimensions.x + 0.3)
+    plt.ylim(-0.3,dimensions.y + 0.3)
     plt.grid(True)
     
     for poi in Pois:
@@ -84,7 +85,6 @@ def drawRouteAlt(dimensions:coordObject, Pois:list[POI], origin:coordObject, rou
         plt.plot(x,y,marker='o',color='k')
 
     positions = [coordObject(origin.x + 0.5,origin.y + 0.5) for _ in routes] 
-    
     time = max(map(len,routes))
     moveStart = coordObject(origin.x,origin.y)
     moveEnd = coordObject(origin.x,origin.y)
@@ -147,7 +147,7 @@ def yDelta(move:ACTION):
 def mapFun(coord:coordObject):
     return POI(coord,0,0)
 
-def interpretFile(name:str,poi:list[POI]=[],dimensions:coordObject=coordObject(5,5),origin:coordObject=coordObject(0,0)):
+def interpretFile(name:str,poi:list[POI]=[],dimensions:coordObject=BIGDIM,origin:coordObject=coordObject(0,0)):
     routes = readFileAction(name)
     drawRouteAlt(dimensions,poi,origin,routes)
 

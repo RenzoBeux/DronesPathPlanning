@@ -1,9 +1,11 @@
 from enum import Enum
 from coordObject import coordObject
 
-DIM = coordObject(5, 5)
+DIM = coordObject(6, 6)
+BIGDIM = coordObject(18,18)
+
 UAVAMOUNT = 2
-TIMELENGTH = 10
+TIMELENGTH = 100
 
 
 class ACTION(Enum):
@@ -16,4 +18,10 @@ class ACTION(Enum):
     DIAG_UP_LEFT = 6
     UP = 7
     DIAG_UP_RIGHT = 8
+    
+P_SUCC = 0.8
 
+class OPERATION(Enum):
+    Generate = 0
+    Draw = 1
+    Resize = 2
