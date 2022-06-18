@@ -1,11 +1,20 @@
 from enum import Enum
 from coordObject import coordObject
+from Obstacle import Obstacle
 
+
+#################################
+##########CONTEXT################
+#################################
 DIM = coordObject(6, 6)
 BIGDIM = coordObject(18,18)
-
 UAVAMOUNT = 2
 TIMELENGTH = 100
+OBSTACLES = [
+    Obstacle(coordObject(0.3, 0.2), coordObject(0.3,0.2 ), 0),
+    Obstacle(coordObject(0.5, 0.5), coordObject(0.5, 0.5), 1),
+    Obstacle(coordObject(0, 1), coordObject(0, 1), 2),
+]
 
 PAUSE_TIME = 0.2
 

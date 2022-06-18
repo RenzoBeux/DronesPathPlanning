@@ -6,11 +6,15 @@ from constants import *
 
 class UAV:
 
-    def __init__(self, dims: coordObject, base: coordObject, heuristic: moveHeuristic, id: int):
+    def __init__(self, dims: coordObject, base: coordObject, obstacles: list[Obstacle], heuristic: moveHeuristic, id: int):
         self.dims = dims
         self.position = base
         self.free = True
         self.moves = []
+        self.obstacles: set[coordObject] = set()
+        for obstacle in obstacles:
+            for object in obstacle.toSections(dims):
+                self.obstacles.add(object)
         self.moveHeuristic = heuristic
         self.id = id
 
@@ -42,6 +46,36 @@ class UAV:
             result.append(ACTION.UP)
             if(moveRight):
                 result.append(ACTION.DIAG_UP_RIGHT)
+
+        # Now we have to remove those actions that lead to an obstacle
+        for obstacle in self.obstacles:
+            for move in result:
+                if(move == ACTION.STAY):
+                    continue
+                if(move == ACTION.RIGHT):
+                    if(self.position.x + 1 == obstacle.x and self.position.y == obstacle.y):
+                        result.remove(ACTION.RIGHT)
+                if(move == ACTION.DIAG_DOWN_RIGHT):
+                    if(self.position.x + 1 == obstacle.x and self.position.y - 1 == obstacle.y):
+                        result.remove(ACTION.DIAG_DOWN_RIGHT)
+                if(move == ACTION.DOWN):
+                    if(self.position.x == obstacle.x and self.position.y - 1 == obstacle.y):
+                        result.remove(ACTION.DOWN)
+                if(move == ACTION.DIAG_DOWN_LEFT):
+                    if(self.position.x - 1 == obstacle.x and self.position.y - 1 == obstacle.y):
+                        result.remove(ACTION.DIAG_DOWN_LEFT)
+                if(move == ACTION.LEFT):
+                    if(self.position.x - 1 == obstacle.x and self.position.y == obstacle.y):
+                        result.remove(ACTION.LEFT)
+                if(move == ACTION.DIAG_UP_LEFT):
+                    if(self.position.x - 1 == obstacle.x and self.position.y + 1 == obstacle.y):
+                        result.remove(ACTION.DIAG_UP_LEFT)
+                if(move == ACTION.UP):
+                    if(self.position.x == obstacle.x and self.position.y + 1 == obstacle.y):
+                        result.remove(ACTION.UP)
+                if(move == ACTION.DIAG_UP_RIGHT):
+                    if(self.position.x + 1 == obstacle.x and self.position.y + 1 == obstacle.y):
+                        result.remove(ACTION.DIAG_UP_RIGHT)
         return result
 
     def move(self, parameters: list[any]):

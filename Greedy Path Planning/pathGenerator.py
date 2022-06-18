@@ -1,5 +1,6 @@
 import os
-from constants import ACTION, DIM, UAVAMOUNT, TIMELENGTH, BIGDIM
+from Obstacle import Obstacle
+from constants import ACTION, DIM, OBSTACLES, UAVAMOUNT, TIMELENGTH, BIGDIM
 from random import randint, random, seed, shuffle
 from coordObject import coordObject
 from POI import POI
@@ -34,19 +35,19 @@ def saveMap(map, id, successProbability):
 def runGreedy(id, successProbability):
     seed(id)
     dims = BIGDIM
-    amountOfUAV = UAVAMOUNT
     POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
     POITimes = [2, 5]
     POIList: list[POI] = []
     UAVList: list[UAV] = []
     needyPOI: list[POI] = []
+    obstacles: list[Obstacle] = OBSTACLES
     # POI and UAV creation
     for i in range(len(POIPosition)):
         currPOI = POI(POIPosition[i], POITimes[i], i)
         POIList.append(currPOI)
         needyPOI.append(currPOI)
     for i in range(UAVAMOUNT):
-        currUAV = UAV(dims, coordObject(0, 0),
+        currUAV = UAV(dims, coordObject(0, 0), obstacles,
                       heuristic_nefesto(successProbability), i)
         UAVList.append(currUAV)
     # printMapGrid(UAVList, list(
