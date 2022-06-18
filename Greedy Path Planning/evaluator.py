@@ -10,8 +10,8 @@ def parseFile(fileName):
         res.append(list(map(lambda x: int(x), line.split())))
     return res
 
-# given a list of lists of strings, returns a list of ACTIONS
-def parseMoves(listOfLists: list[list[str]]) -> list[ACTION]:
+# given a list of lists of ints, returns a list of ACTIONS
+def parseMoves(listOfLists: list[list[int]]) -> list[ACTION]:
     res = []
     for line in listOfLists:
         res.append(list(map(lambda x: ACTION(x), line)))
@@ -101,10 +101,14 @@ def evaluateDronesCollision(actions:list[list[ACTION]], areaDims:coordObject) ->
 
 
 def evaluate(grid:list[list[ACTION]]):
-    print(evaluateCoverageArea(grid,coordObject(5, 5)))
-    print(evaluateDronesCollision(grid,coordObject(5, 5)))
+    coverage = evaluateCoverageArea(grid,coordObject(5, 5))
+    collision = evaluateDronesCollision(grid,coordObject(5, 5))
+    print("Coverage: " + str(coverage))
+    print("Collision: " + str(collision))
+    return (coverage + collision)/2
+
 
 
 lista = parseFile('output/90/1.txt')
 renderedList = parseMoves(lista)
-evaluate(renderedList)
+print("Evaluate: " + str(evaluate(renderedList)))
