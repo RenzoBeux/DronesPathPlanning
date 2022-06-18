@@ -1,9 +1,6 @@
 from constants import ACTION, DIM
-from coordObject import coordObject
-from POI import POI
 from UAV import UAV
-from heuristics.ImoveHeuristic import moveHeuristic
-from heuristics.nefesto import heuristic_nefesto
+
 def printMapGrid(drones: list[UAV], POIPos):
     for aux in range(DIM.y):
         if aux == 0:
@@ -35,3 +32,16 @@ def printMapGrid(drones: list[UAV], POIPos):
             for x in range(DIM.x):
                 print('_______', end='')
         print()
+
+def readFileAction(fileName):
+    """
+    Reads a file and interprets it as a list of sequences of ACTIONs
+    """
+    file = open(fileName,'r')
+    lines = file.readlines()
+    file.close()
+    result = []
+    for line in lines:
+        line = line.replace('\n','')
+        result.append(list(map(lambda x:ACTION(int(x)),line.split(' '))))
+    return result

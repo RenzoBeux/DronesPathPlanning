@@ -1,6 +1,8 @@
 from coordObject import coordObject
-from math import gcd, ceil
-from constants import ACTION 
+from math import gcd
+from constants import ACTION, BIGDIM, DIM
+from utils import readFileAction
+
 def converter(originalDim:coordObject,targetDim:coordObject,moves:list[ACTION]):
     xGCD = gcd(originalDim.x,targetDim.x)
     yGCD = gcd(originalDim.y,targetDim.y)
@@ -81,7 +83,12 @@ def yDelta(move:ACTION):
     else:
         return 0
 
-originalDim = coordObject(4,4)
-targetDim = coordObject(2,2)
-moves = [ACTION.UP,ACTION.UP,ACTION.RIGHT,ACTION.RIGHT,ACTION.LEFT,ACTION.DIAG_UP_LEFT,ACTION.DOWN,ACTION.RIGHT,ACTION.UP,ACTION.DOWN]
-print(converter(originalDim,targetDim,moves))
+def resizeRoute(name:str) -> list[list[ACTION]]:
+    moves = readFileAction(name)
+    return list(map(lambda r:converter(BIGDIM,DIM,r),moves))
+
+if __name__ == "__main__":
+    originalDim = coordObject(4,4)
+    targetDim = coordObject(2,2)
+    moves = [ACTION.UP,ACTION.UP,ACTION.RIGHT,ACTION.RIGHT,ACTION.LEFT,ACTION.DIAG_UP_LEFT,ACTION.DOWN,ACTION.RIGHT,ACTION.UP,ACTION.DOWN]
+    print(converter(originalDim,targetDim,moves))
