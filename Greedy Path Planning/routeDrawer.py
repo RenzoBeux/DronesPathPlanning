@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 from coordObject import coordObject
-from constants import ACTION, BIGDIM, DIM, PAUSE_TIME
+from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES
 from POI import POI
 from utils import readFileAction
+from Obstacle import Obstacle
 
 colors = ['b', 'g', 'r', 'c', 'm', 'k']
 markers = ['o', '^', 'v']
@@ -75,7 +76,7 @@ def drawRoute(dimensions: coordObject, Pois: list[POI], origin: coordObject, rou
     return 0
 
 
-def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, routes: list[list[ACTION]]):
+def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, obstacles:list[Obstacle], routes: list[list[ACTION]]):
     """
     Graphs using pyplot the trajectories of the UAVs, graphins simultaneosly each move of each drone
     """
@@ -87,6 +88,13 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
     ticks = [t for t in range(dimensions.x)]
     plt.xticks(ticks=ticks)
     plt.yticks(ticks=ticks)
+
+
+    badSectionList = list(map(lambda obs: obs.toSections(dimensions), obstacles))
+    for badSection in [x for xs in badSectionList for x in xs]:
+        plt.fill(   [badSection.x,badSection.x+1,badSection.x+1,badSection.x],
+                    [badSection.y,badSection.y,badSection.y+1,badSection.y+1],
+                    color='black',alpha=0.5)
 
     for poi in Pois:
         x = poi.getSection(dimensions).x + 0.5
@@ -160,9 +168,9 @@ def yDelta(move: ACTION):
         return 0
 
 
-def interpretFile(name:str,poi:list[POI]=[],dimensions:coordObject=BIGDIM,origin:coordObject=coordObject(0,0)):
+def interpretFile(name:str,poi:list[POI]=[],dimensions:coordObject=BIGDIM,origin:coordObject=coordObject(0,0),obstacles:list[Obstacle]=OBSTACLES):
     routes = readFileAction(name)
-    drawRouteAlt(dimensions,poi,origin,routes)
+    drawRouteAlt(dimensions,poi,origin,obstacles,routes)
 
 # given a list of lists of strings, returns a list of ACTIONS
 

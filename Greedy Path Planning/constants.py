@@ -13,7 +13,7 @@ TIMELENGTH = 100
 OBSTACLES = [
     Obstacle(coordObject(0.3, 0.2), coordObject(0.3,0.2 ), 0),
     Obstacle(coordObject(0.5, 0.5), coordObject(0.5, 0.5), 1),
-    Obstacle(coordObject(0, 1), coordObject(0, 1), 2),
+    Obstacle(coordObject(0, 0.99), coordObject(0, 0.99), 2),
 ]
 
 PAUSE_TIME = 0.2

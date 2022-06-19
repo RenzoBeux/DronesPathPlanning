@@ -23,7 +23,7 @@ if __name__ == "__main__":
                 currPOI = POI(POIPosition[i], POITimes[i], i)
                 POIList.append(currPOI)
             newRoutes = resizeRoute('1.txt')
-            drawRouteAlt(DIM,POIList,coordObject(0,0),newRoutes)
+            drawRouteAlt(DIM,POIList,coordObject(0,0),[],newRoutes)
         else:
             print("Invalid operation")
             print("Valid operations are ")
