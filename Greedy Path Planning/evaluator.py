@@ -99,12 +99,38 @@ def evaluateDronesCollision(actions:list[list[ACTION]], areaDims:coordObject) ->
             
     return 100 - (res / worstCase * 100)
 
+# This function will punish drones for flying over obstacles
+def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float:
+    area = populateArea(actions,areaDims)
+    numberOfDrones = len(actions)
+    numberOfTimes = len(actions[0])
+    # Worst case is considered as every drone spending every instant over an obstacle
+    worstCase = numberOfDrones * numberOfTimes
+    obstaclesBySections:list[list[coordObject]] = list(map(lambda obs:obs.toSections(),OBSTACLES))
+    flat_obs:list[coordObject] = []
+    # Suboptimal as all hell
+    for sectionList in obstaclesBySections:
+        for section in sectionList:
+            for alreadyAccounted in flat_obs:
+                if(alreadyAccounted.x != section.x and alreadyAccounted.y != section.y):
+                    flat_obs.append(section)
+    
+    timeOnObs = 0
+    for obs in flat_obs:
+        x = obs.x
+        y = obs.y
+        timeOnObs += len(area[x][y])
+    
+    return timeOnObs / worstCase
+
 
 def evaluate(grid:list[list[ACTION]]):
     coverage = evaluateCoverageArea(grid,coordObject(5, 5))
     collision = evaluateDronesCollision(grid,coordObject(5, 5))
+    obstacles = evaluateObstacles(grid,coordObject(5,5))
     print("Coverage: " + str(coverage))
     print("Collision: " + str(collision))
+    print("Obstacles: " + str(obstacles))
     return (coverage + collision)/2
 
 
