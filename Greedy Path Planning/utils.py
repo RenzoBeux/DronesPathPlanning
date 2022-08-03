@@ -1,7 +1,10 @@
+from POI import POI
 from constants import ACTION, DIM
 from UAV import UAV
+from coordObject import coordObject
 
-def printMapGrid(drones: list[UAV], POIPos):
+
+def printMapGrid(drones: list[UAV], POIPos: list[coordObject]):
     for aux in range(DIM.y):
         if aux == 0:
             for x in range(DIM.x):
@@ -33,15 +36,16 @@ def printMapGrid(drones: list[UAV], POIPos):
                 print('_______', end='')
         print()
 
+
 def readFileAction(fileName):
     """
     Reads a file and interprets it as a list of sequences of ACTIONs
     """
-    file = open(fileName,'r')
+    file = open(fileName, 'r')
     lines = file.readlines()
     file.close()
     result = []
     for line in lines:
-        line = line.replace('\n','')
-        result.append(list(map(lambda x:ACTION(int(x)),line.split(' '))))
+        line = line.replace('\n', '')
+        result.append(list(map(lambda x: ACTION(int(x)), line.split(' '))))
     return result

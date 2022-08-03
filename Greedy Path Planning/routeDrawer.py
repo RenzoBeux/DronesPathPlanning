@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from coordObject import coordObject
-from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES
+from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES, POIS
 from POI import POI
 from utils import readFileAction
 from Obstacle import Obstacle
@@ -76,35 +76,35 @@ def drawRoute(dimensions: coordObject, Pois: list[POI], origin: coordObject, rou
     return 0
 
 
-def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, obstacles:list[Obstacle], routes: list[list[ACTION]]):
+def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, obstacles: list[Obstacle], routes: list[list[ACTION]]):
     """
     Graphs using pyplot the trajectories of the UAVs, graphins simultaneosly each move of each drone
     """
     plt.figure()
     print(dimensions.x)
-    plt.xlim(-0.3,dimensions.x + 0.3)
-    plt.ylim(-0.3,dimensions.y + 0.3)
+    plt.xlim(-0.3, dimensions.x + 0.3)
+    plt.ylim(-0.3, dimensions.y + 0.3)
     plt.grid(True)
     ticks = [t for t in range(dimensions.x)]
     plt.xticks(ticks=ticks)
     plt.yticks(ticks=ticks)
 
-
-    badSectionList = list(map(lambda obs: obs.toSections(dimensions), obstacles))
+    badSectionList = list(
+        map(lambda obs: obs.toSections(dimensions), obstacles))
     for badSection in [x for xs in badSectionList for x in xs]:
-        plt.fill(   [badSection.x,badSection.x+1,badSection.x+1,badSection.x],
-                    [badSection.y,badSection.y,badSection.y+1,badSection.y+1],
-                    color='black',alpha=0.5)
+        plt.fill([badSection.x, badSection.x+1, badSection.x+1, badSection.x],
+                 [badSection.y, badSection.y, badSection.y+1, badSection.y+1],
+                 color='black', alpha=0.5)
 
     for poi in Pois:
         x = poi.getSection(dimensions).x + 0.5
         y = poi.getSection(dimensions).y + 0.5
         plt.plot(x, y, marker='o', color='k')
 
-    positions = [coordObject(origin.x + 0.5,origin.y + 0.5) for _ in routes] 
-    time = max(map(len,routes))
-    moveStart = coordObject(origin.x,origin.y)
-    moveEnd = coordObject(origin.x,origin.y)
+    positions = [coordObject(origin.x + 0.5, origin.y + 0.5) for _ in routes]
+    time = max(map(len, routes))
+    moveStart = coordObject(origin.x, origin.y)
+    moveEnd = coordObject(origin.x, origin.y)
     tempPos = []
     for t in range(time):
         for index, route in enumerate(routes):
@@ -168,9 +168,9 @@ def yDelta(move: ACTION):
         return 0
 
 
-def interpretFile(name:str,poi:list[POI]=[],dimensions:coordObject=BIGDIM,origin:coordObject=coordObject(0,0),obstacles:list[Obstacle]=OBSTACLES):
+def interpretFile(name: str, poi: list[POI] = [], dimensions: coordObject = BIGDIM, origin: coordObject = coordObject(0, 0), obstacles: list[Obstacle] = OBSTACLES):
     routes = readFileAction(name)
-    drawRouteAlt(dimensions,poi,origin,obstacles,routes)
+    drawRouteAlt(dimensions, poi, origin, obstacles, routes)
 
 # given a list of lists of strings, returns a list of ACTIONS
 
@@ -187,11 +187,9 @@ def mapFun(coord: coordObject):
 
 
 if __name__ == '__main__':
-    routes = parseFile('output/90/1.txt')
-    moves = parseMoves(routes)
-    coordPoi = [coordObject(0.8, 0.5), coordObject(
-        0.75, 0.9), coordObject(0.9, 0)]
-    poi = list(map(mapFun, coordPoi))
-    dimensions = coordObject(5, 5)
-    origin = coordObject(0, 0)
-    drawRouteAlt(dimensions, poi, origin, moves)
+    poiList = []
+    # for each POI create a POI
+    for poi in POIS:
+        poiList.append(POI(poi, 0, 0))
+
+    interpretFile('9.txt', poiList, DIM, coordObject(0, 0), OBSTACLES)

@@ -15,7 +15,11 @@ class UAV:
         for obstacle in obstacles:
             for object in obstacle.toSections(dims):
                 self.obstacles.add(object)
+        self.obstaclesRaw = obstacles
         self.moveHeuristic = heuristic
+        self.battery = BATTERY_CAPACITY
+        self.charging = False
+        self.chargingTime = TIME_TO_CHARGE
         self.id = id
 
     def getTarget(self):
@@ -79,12 +83,27 @@ class UAV:
         return result
 
     def move(self, parameters: list[any]):
-        parameters.append(self.position)
-        parameters.append(self.possibleMoves())
-        move, needyPOI = self.moveHeuristic.getMove(parameters)
-        self.shiftPosition(move)
-        self.moves.append(move)
-        return needyPOI
+        if (self.charging):
+            self.chargingTime -= 1
+            if (self.chargingTime == 0):
+                self.charging = False
+                self.battery = BATTERY_CAPACITY
+                return parameters[2]  # returneo el needy poi como me vino
+        if (self.needCharge()):
+            move = self.moveToCharge()
+            if (move == ACTION.STAY):
+                self.charging = True
+            self.shiftPosition(move)
+            self.moves.append(move)
+            return parameters[2]  # returneo el needy poi como me vino
+        else:
+            self.battery -= 1
+            parameters.append(self.position)
+            parameters.append(self.possibleMoves())
+            move, needyPOI = self.moveHeuristic.getMove(parameters)
+            self.shiftPosition(move)
+            self.moves.append(move)
+            return needyPOI
 
     def shiftPosition(self, chosenMove: ACTION):
         if chosenMove == ACTION.STAY:
@@ -115,3 +134,31 @@ class UAV:
         for i in range(len(self.moves)):
             values.append(self.moves[i].value)
         return values
+
+    def moveToCharge(self) -> ACTION:
+        # gets the most direct move towards cordObject(0,0)
+        if (self.position.x == 0 and self.position.y == 0):
+            return ACTION.STAY
+        if (self.position.x == 0):
+            if (self.position.y > 0):
+                return ACTION.DOWN
+        if (self.position.y == 0):
+            if (self.position.x > 0):
+                return ACTION.LEFT
+        if (self.position.x > 0 and self.position.y > 0):
+            return ACTION.DIAG_DOWN_LEFT
+
+        return ACTION.STAY
+
+# This function returns the number of moves towards cordObject(0,0)
+    def movesTowardBase(self):
+        counter = 0
+        auxUAV = UAV(self.dims, coordObject(self.position.x,
+                     self.position.y), self.obstaclesRaw, None, -1)
+        while (auxUAV.position.x != 0 or auxUAV.position.y != 0):
+            auxUAV.shiftPosition(auxUAV.moveToCharge())
+            counter += 1
+        return counter
+
+    def needCharge(self):
+        return self.movesTowardBase() >= self.battery
