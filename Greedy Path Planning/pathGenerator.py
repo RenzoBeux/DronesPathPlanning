@@ -1,6 +1,6 @@
 import os
 from Obstacle import Obstacle
-from constants import ACTION, DIM, OBSTACLES, UAVAMOUNT, TIMELENGTH, BIGDIM
+from constants import ACTION, DIM, OBSTACLES, POIS, POIS_TIMES, UAVAMOUNT, TIMELENGTH, BIGDIM
 from random import randint, random, seed, shuffle
 from coordObject import coordObject
 from POI import POI
@@ -34,9 +34,9 @@ def saveMap(map, id, successProbability):
 
 def runGreedy(id, successProbability):
     seed(id)
-    dims = BIGDIM
-    POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
-    POITimes = [2, 5]
+    dims = DIM
+    POIPosition = list(POIS)
+    POITimes = POIS_TIMES
     POIList: list[POI] = []
     UAVList: list[UAV] = []
     needyPOI: list[POI] = []
@@ -57,6 +57,7 @@ def runGreedy(id, successProbability):
     shuffle(UAVList)
     # Creation of the routes
     for t in range(TIMELENGTH):
+        print('TIME:', t)
         # print(UAVList[0].position.x, ' ', UAVList[0].position.y)
         for poi in POIList:
             flag = True
@@ -73,7 +74,7 @@ def runGreedy(id, successProbability):
             # print("------------------------")
 
         # printMapGrid(UAVList, list(
-        #     map(lambda poi: poi.getSection(dims), POIList)))
+            # map(lambda poi: poi.getSection(dims), POIList)))
 
     # i want the table to be sorted at the end
     UAVList.sort(key=lambda x: x.id)
