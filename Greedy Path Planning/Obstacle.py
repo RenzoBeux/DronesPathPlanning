@@ -1,5 +1,4 @@
 from coordObject import coordObject
-from constants import *
 
 
 class Obstacle:

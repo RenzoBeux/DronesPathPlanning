@@ -42,8 +42,6 @@ class heuristic_nefesto(moveHeuristic):
                 randomNumber = randint(0, len(choice)-1)
             else:
                 randomNumber = 0
-            if(choice == []):
-                print("WTF DUDE")
             chosenMove = choice[randomNumber]
         else:
             randomNumber = randint(0, len(possibleMoves)-1)

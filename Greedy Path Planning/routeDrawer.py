@@ -130,15 +130,16 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
                                      moveEnd.y+offset.y), color=colors[index])
                 plt.plot([moveStart.x, moveEnd.x], [
                          moveStart.y, moveEnd.y], color=colors[index])
-        
-        
-        timer = plt.annotate(str(t),[dimensions.x + 0.3,dimensions.y + 0.3],fontsize=22)
+
+        timer = plt.annotate(
+            str(t), [dimensions.x + 0.3, dimensions.y + 0.3], fontsize=22)
         plt.pause(PAUSE_TIME)
         for temp in tempPos:
             temp.remove()
         tempPos.clear()
         timer.remove()
-    timer = plt.annotate(str(t),[dimensions.x + 0.3,dimensions.y + 0.3],fontsize=22)
+    timer = plt.annotate(
+        str(t+1), [dimensions.x + 0.3, dimensions.y + 0.3], fontsize=22)
     plt.show()
 
 

@@ -4,7 +4,7 @@ from UAV import UAV
 from coordObject import coordObject
 
 
-def printMapGrid(drones: list[UAV], POIPos: list[coordObject]):
+def printMapGrid(drones: list[UAV], POIPos: list[coordObject], obstacles: list[coordObject]):
     for aux in range(DIM.y):
         if aux == 0:
             for x in range(DIM.x):
@@ -17,6 +17,8 @@ def printMapGrid(drones: list[UAV], POIPos: list[coordObject]):
         for x in range(DIM.x):
             isPOI = [coords for coords in POIPos if (
                 coords.x == x and coords.y == y)] != []
+            isObstacle = [coords for coords in obstacles if (
+                coords.x == x and coords.y == y)] != []
             filtered = list(filter(
                 lambda drone: x == drone.position.x and y == drone.position.y, drones))
             isDrone = list(filtered) != []
@@ -25,7 +27,9 @@ def printMapGrid(drones: list[UAV], POIPos: list[coordObject]):
                     print('D'+str(d.id), end='')
             if(isPOI):
                 print('P', end='')
-            if(not isPOI and not isDrone):
+            if(isObstacle):
+                print('O', end='')
+            if(not isPOI and not isDrone and not isObstacle):
                 print('-', end='')
             # prints a tab
             print('    ', end='')

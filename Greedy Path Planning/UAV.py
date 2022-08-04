@@ -94,6 +94,7 @@ class UAV:
             if (move == ACTION.STAY):
                 self.charging = True
             self.shiftPosition(move)
+            self.battery -= 1
             self.moves.append(move)
             return parameters[2]  # returneo el needy poi como me vino
         else:
@@ -136,19 +137,40 @@ class UAV:
         return values
 
     def moveToCharge(self) -> ACTION:
-        # gets the most direct move towards cordObject(0,0)
-        if (self.position.x == 0 and self.position.y == 0):
+        targetCoords: coordObject = coordObject(0, 0)
+        results: list[ACTION] = []
+        position = self.position
+        # if im on target the return stay
+        if(self.position.x == 0 and self.position.y == 0):
+            results.append(ACTION.STAY)
             return ACTION.STAY
-        if (self.position.x == 0):
-            if (self.position.y > 0):
-                return ACTION.DOWN
-        if (self.position.y == 0):
-            if (self.position.x > 0):
-                return ACTION.LEFT
-        if (self.position.x > 0 and self.position.y > 0):
-            return ACTION.DIAG_DOWN_LEFT
+        if position.x < targetCoords.x:
+            results.append(ACTION.RIGHT)
+            if position.y > targetCoords.y:
+                results.append(ACTION.DIAG_DOWN_RIGHT)
+        if position.y > targetCoords.y:
+            results.append(ACTION.DOWN)
+            if position.x > targetCoords.x:
+                results.append(ACTION.DIAG_DOWN_LEFT)
+        if position.x > targetCoords.x:
+            results.append(ACTION.LEFT)
+            if position.y < targetCoords.y:
+                results.append(ACTION.DIAG_UP_LEFT)
+        if position.y < targetCoords.y:
+            results.append(ACTION.UP)
+            if position.x < targetCoords.x:
+                results.append(ACTION.DIAG_UP_RIGHT)
 
-        return ACTION.STAY
+        process = [value for value in results if value in self.possibleMoves()]
+        def premise(x): return x in [
+            ACTION.DIAG_DOWN_RIGHT, ACTION.DIAG_DOWN_LEFT, ACTION.DIAG_UP_LEFT, ACTION.DIAG_UP_RIGHT]
+        # if there is a diagonal move, return it
+        if(len(process) > 0):
+            for move in process:
+                if(premise(move)):
+                    return move
+        # if there is no diagonal move, return the first move
+        return process[0]
 
 # This function returns the number of moves towards cordObject(0,0)
     def movesTowardBase(self):
