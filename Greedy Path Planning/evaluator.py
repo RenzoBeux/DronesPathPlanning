@@ -1,6 +1,7 @@
 # this function parses the txt file and returns a list of lists
 from collections import Counter
 from constants import *
+from utils import flatten_obstacles
 
 
 def parseFile(fileName):
@@ -106,14 +107,7 @@ def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float
     numberOfTimes = len(actions[0])
     # Worst case is considered as every drone spending every instant over an obstacle
     worstCase = numberOfDrones * numberOfTimes
-    obstaclesBySections:list[list[coordObject]] = list(map(lambda obs:obs.toSections(),OBSTACLES))
-    flat_obs:list[coordObject] = []
-    # Suboptimal as all hell
-    for sectionList in obstaclesBySections:
-        for section in sectionList:
-            for alreadyAccounted in flat_obs:
-                if(alreadyAccounted.x != section.x and alreadyAccounted.y != section.y):
-                    flat_obs.append(section)
+    flat_obs = flatten_obstacles(areaDims)
     
     timeOnObs = 0
     for obs in flat_obs:
@@ -125,16 +119,17 @@ def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float
 
 
 def evaluate(grid:list[list[ACTION]]):
-    coverage = evaluateCoverageArea(grid,coordObject(5, 5))
-    collision = evaluateDronesCollision(grid,coordObject(5, 5))
-    obstacles = evaluateObstacles(grid,coordObject(5,5))
+    gridDimensions = DIM
+    coverage = evaluateCoverageArea(grid,gridDimensions)
+    collision = evaluateDronesCollision(grid,gridDimensions)
+    obstacles = evaluateObstacles(grid,gridDimensions)
     print("Coverage: " + str(coverage))
     print("Collision: " + str(collision))
     print("Obstacles: " + str(obstacles))
     return (coverage + collision)/2
 
 
-
-lista = parseFile('output/90/1.txt')
-renderedList = parseMoves(lista)
-print("Evaluate: " + str(evaluate(renderedList)))
+if __name__ == '__main__':
+    lista = parseFile('output/90/1.txt')
+    renderedList = parseMoves(lista)
+    print("Evaluate: " + str(evaluate(renderedList)))

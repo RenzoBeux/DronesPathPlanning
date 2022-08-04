@@ -1,14 +1,13 @@
-from dimConverter import converter
-from routeDrawer import drawRoute, readFileAction
+from POI import POI
+from routeDrawer import drawRouteAlt, readFileAction
 from coordObject import coordObject
+from constants import BIGDIM, DIM, POIS, ORIGIN, OBSTACLES
 
-originalDims = coordObject(8,8)
-targetDims = coordObject(4,4)
+originalDims = BIGDIM
+targetDims = DIM
 
-routes = readFileAction('1.txt')
+routes = readFileAction('./output/90/1.txt')
+pois:list[POI] = list(map(lambda coords: POI(coords,0,0),POIS))
+drawRouteAlt(DIM,pois,ORIGIN,OBSTACLES, routes)
 
-drawRoute(originalDims,[],coordObject(0,0),routes)
 
-newRoutes = map(lambda route:converter(originalDims,targetDims,route),routes)
-
-drawRoute(targetDims,[],coordObject(0,0),newRoutes)

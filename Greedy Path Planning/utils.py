@@ -1,5 +1,5 @@
 from POI import POI
-from constants import ACTION, DIM
+from constants import ACTION, DIM, OBSTACLES
 from UAV import UAV
 from coordObject import coordObject
 
@@ -49,3 +49,14 @@ def readFileAction(fileName):
         line = line.replace('\n', '')
         result.append(list(map(lambda x: ACTION(int(x)), line.split(' '))))
     return result
+
+def flatten_obstacles(areaDims:coordObject):
+    obstaclesBySections:list[list[coordObject]] = list(map(lambda obs:obs.toSections(areaDims),OBSTACLES))
+    flat_obs:list[coordObject] = []
+    # Suboptimal as all hell
+    for sectionList in obstaclesBySections:
+        for section in sectionList:
+            for alreadyAccounted in flat_obs:
+                if(alreadyAccounted.x != section.x and alreadyAccounted.y != section.y):
+                    flat_obs.append(section)
+    return flat_obs

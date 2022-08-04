@@ -50,8 +50,6 @@ def runGreedy(id, successProbability):
         currUAV = UAV(dims, coordObject(0, 0), obstacles,
                       heuristic_nefesto(successProbability), i)
         UAVList.append(currUAV)
-    # printMapGrid(UAVList, list(
-        # map(lambda poi: poi.getSection(dims), POIList)))
 
     # add randomness to UAV picking POIs
     shuffle(UAVList)
@@ -68,20 +66,10 @@ def runGreedy(id, successProbability):
                 needyPOI.append(poi)
         for uav in UAVList:
             needyPOI = uav.move([t, dims, needyPOI])
-            # print("------------" + str(uav.id) + "------------")
-            # print(list(map(lambda move: move.name, uav.moves)))
-            # print(uav.getTarget().id)
-            # print("------------------------")
-
-        # printMapGrid(UAVList, list(
-            # map(lambda poi: poi.getSection(dims), POIList)))
 
     # i want the table to be sorted at the end
     UAVList.sort(key=lambda x: x.id)
     res = []
     for uav in UAVList:
-        # print(uav.id)
         res.append(list(map(lambda move: str(move.value), uav.moves)))
-        # print(list(map(lambda move: move.name, uav.moves)))
-        # print(uav.valuesArray())
     saveMap(res, id, successProbability)
