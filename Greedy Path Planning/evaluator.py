@@ -1,8 +1,8 @@
 # this function parses the txt file and returns a list of lists
 from collections import Counter
-from constants import *
+from constants import POIS, POIS_TIMES, ACTION, coordObject, DIM
 from utils import flatten_obstacles
-
+from POI import POI
 
 def parseFile(fileName):
     file = open(fileName, 'r')
@@ -110,7 +110,6 @@ def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float
     flat_obs = flatten_obstacles(areaDims)
     
     timeOnObs = 0
-    print(flat_obs)
     for obs in flat_obs:
         x = obs.x
         y = obs.y
@@ -118,16 +117,48 @@ def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float
     
     return 1 - timeOnObs / worstCase
 
+def evaluatePOICoverage(actions:list[list[ACTION]],areaDims:coordObject) -> float:
+    area = populateArea(actions,areaDims)
+    timeSpentNeedy = [0 for _ in POIS]
+    lastVisit = [0 for _ in POIS]
+    time = len(actions[0])
+    # list of objects is needed to access aux functions
+    pois = [POI(coords,0,0) for coords in POIS]
+
+    for t in range(time):
+        for i, poi in enumerate(pois):
+            coords = poi.getSection(areaDims)
+            x = coords.x
+            y = coords.y
+            if(t in area[x][y]):
+                lastVisit[i] = t
+            elif(t - lastVisit[i] > POIS_TIMES[i]):
+                timeSpentNeedy[i]+=1
+
+    totalTimeSpentNeedy = 0
+    for needy in timeSpentNeedy:
+        totalTimeSpentNeedy += needy
+
+    maxNeedyTimes = [time-poiTime for poiTime in POIS_TIMES]
+    maximumNeediness = 0
+    for needy in maxNeedyTimes:
+        maximumNeediness += needy
+    
+    return 1 - totalTimeSpentNeedy/maximumNeediness
+
 
 def evaluate(grid:list[list[ACTION]]):
     gridDimensions = DIM
-    coverage = evaluateCoverageArea(grid,gridDimensions)
-    collision = evaluateDronesCollision(grid,gridDimensions)
-    obstacles = evaluateObstacles(grid,gridDimensions)
-    print("Coverage: " + str(coverage))
-    print("Collision: " + str(collision))
-    print("Obstacles: " + str(obstacles))
-    return (coverage + collision)/2
+    # Further evaluators must be added to this dictionary
+    evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage}
+
+    evaluateMetric = lambda eval: eval(grid,gridDimensions)
+    results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
+    accumulator = 0
+    for k, v in results.items():
+        accumulator += v
+        print(k,' = ',v)
+    return accumulator / len(results)
 
 
 if __name__ == '__main__':
