@@ -81,9 +81,9 @@ def evaluateCoverageArea(actions:list[list[ACTION]], areaDims:coordObject) -> fl
         for j in range(areaDims.y):
             if len(area[i][j]) == 0:
                 res = res - 1
-    return res / numberOfSquares *100
+    return res / numberOfSquares
 
-#This function will punish if drones share the same square at the same time
+#This function will reward if drones don't share the same square at the same time
 def evaluateDronesCollision(actions:list[list[ACTION]], areaDims:coordObject) -> float:
     area = populateArea(actions, areaDims)
     numberOfDrones = len(actions)
@@ -98,9 +98,9 @@ def evaluateDronesCollision(actions:list[list[ACTION]], areaDims:coordObject) ->
                 res = res + duplicates[k]
 
             
-    return 100 - (res / worstCase * 100)
+    return 1 - (res / worstCase)
 
-# This function will punish drones for flying over obstacles
+# This function will reward drones for not flying over obstacles
 def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float:
     area = populateArea(actions,areaDims)
     numberOfDrones = len(actions)
@@ -110,12 +110,13 @@ def evaluateObstacles(actions:list[list[ACTION]], areaDims:coordObject) -> float
     flat_obs = flatten_obstacles(areaDims)
     
     timeOnObs = 0
+    print(flat_obs)
     for obs in flat_obs:
         x = obs.x
         y = obs.y
         timeOnObs += len(area[x][y])
     
-    return timeOnObs / worstCase
+    return 1 - timeOnObs / worstCase
 
 
 def evaluate(grid:list[list[ACTION]]):

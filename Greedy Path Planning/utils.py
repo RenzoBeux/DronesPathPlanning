@@ -50,13 +50,17 @@ def readFileAction(fileName):
         result.append(list(map(lambda x: ACTION(int(x)), line.split(' '))))
     return result
 
-def flatten_obstacles(areaDims:coordObject):
+def flatten_obstacles(areaDims:coordObject)->list[coordObject]:
     obstaclesBySections:list[list[coordObject]] = list(map(lambda obs:obs.toSections(areaDims),OBSTACLES))
     flat_obs:list[coordObject] = []
     # Suboptimal as all hell
     for sectionList in obstaclesBySections:
         for section in sectionList:
+            isAccounted = False
             for alreadyAccounted in flat_obs:
-                if(alreadyAccounted.x != section.x and alreadyAccounted.y != section.y):
-                    flat_obs.append(section)
+                if(alreadyAccounted.x == section.x and alreadyAccounted.y == section.y):
+                    isAccounted = True
+                    break
+            if(not isAccounted):
+                flat_obs.append(section)
     return flat_obs

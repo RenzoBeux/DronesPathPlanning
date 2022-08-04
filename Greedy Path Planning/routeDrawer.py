@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from coordObject import coordObject
 from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES, POIS
 from POI import POI
-from utils import readFileAction
+from utils import readFileAction, flatten_obstacles
 from Obstacle import Obstacle
 
 colors = ['b', 'g', 'r', 'c', 'm', 'k']
@@ -89,9 +89,7 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
     plt.xticks(ticks=ticks)
     plt.yticks(ticks=ticks)
 
-    badSectionList = list(
-        map(lambda obs: obs.toSections(dimensions), obstacles))
-    for badSection in [x for xs in badSectionList for x in xs]:
+    for badSection in flatten_obstacles(dimensions):
         plt.fill([badSection.x, badSection.x+1, badSection.x+1, badSection.x],
                  [badSection.y, badSection.y, badSection.y+1, badSection.y+1],
                  color='black', alpha=0.5)
@@ -132,11 +130,15 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
                                      moveEnd.y+offset.y), color=colors[index])
                 plt.plot([moveStart.x, moveEnd.x], [
                          moveStart.y, moveEnd.y], color=colors[index])
-
+        
+        
+        timer = plt.annotate(str(t),[dimensions.x + 0.3,dimensions.y + 0.3],fontsize=22)
         plt.pause(PAUSE_TIME)
         for temp in tempPos:
             temp.remove()
         tempPos.clear()
+        timer.remove()
+    timer = plt.annotate(str(t),[dimensions.x + 0.3,dimensions.y + 0.3],fontsize=22)
     plt.show()
 
 
