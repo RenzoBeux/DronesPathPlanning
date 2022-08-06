@@ -3,6 +3,9 @@ from collections import Counter
 from constants import POIS, POIS_TIMES, ACTION, coordObject, DIM
 from utils import flatten_obstacles
 from POI import POI
+import matplotlib.pyplot as plt
+
+colors = ['b', 'g', 'r', 'c', 'm', 'k']
 
 def parseFile(fileName):
     file = open(fileName, 'r')
@@ -65,7 +68,6 @@ def populateArea(actions:list[list[ACTION]], areaDims:coordObject) -> list[list[
 
 def get_duplicates(array):
     c = Counter(array)
-    #return a dictonary
     return {k: v for k, v in c.items() if v > 1}
 
 ################################################################################################################################################
@@ -97,7 +99,6 @@ def evaluateDronesCollision(actions:list[list[ACTION]], areaDims:coordObject) ->
             for k in duplicates:
                 res = res + duplicates[k]
 
-            
     return 1 - (res / worstCase)
 
 # This function will reward drones for not flying over obstacles
@@ -155,13 +156,45 @@ def evaluate(grid:list[list[ACTION]]):
     evaluateMetric = lambda eval: eval(grid,gridDimensions)
     results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
     accumulator = 0
-    for k, v in results.items():
+    for v in results.values():
         accumulator += v
-        print(k,' = ',v)
-    return accumulator / len(results)
+    return results
+
+def evaluateOutputs():
+    partialGraph = {'Coverage':0,   'Collision':0,  'Obstacles':0,  'POIS':0}
+    finalGraph =   {'Coverage':[],  'Collision':[], 'Obstacles':[], 'POIS':[]}
+    for probToGoTarget in range(70,100):
+        partialGraph = {'Coverage':0,'Collision':0,'Obstacles':0,'POIS':0}
+        for i in range(1,10):
+            fileToParse = 'output/'+str(probToGoTarget)+'/'+str(i)+'.txt'
+            list = parseFile(fileToParse)
+            listOfRoutes = parseMoves(list)
+            evalResults = evaluate(listOfRoutes)
+            partialGraph = {k:v+partialGraph[k] for k,v in evalResults.items()}
+        finalGraph = {k:finalGraph[k] + [partialGraph[k]/9] for k in partialGraph.keys()}
+
+    bar_width = 0.2
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+    index = 0
+    for v in finalGraph.values():
+        X = [i + index * bar_width for i in range(70,100)]
+        ax.bar(X, v , color = colors[index], width = bar_width)
+        index += 1
+    # print(finalGraph)
+    plt.show()
+
+
+    
 
 
 if __name__ == '__main__':
     lista = parseFile('output/90/1.txt')
     renderedList = parseMoves(lista)
-    print("Evaluate: " + str(evaluate(renderedList)))
+
+    evalResults = evaluate(renderedList)
+    total = 0
+    for k, v in evalResults.items():
+        total += v
+        print(k, ' = ', v)
+    print('Total = ',total/len(evalResults))
