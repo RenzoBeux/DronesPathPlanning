@@ -1,11 +1,10 @@
 # this function parses the txt file and returns a list of lists
 from collections import Counter
-from constants import POIS, POIS_TIMES, ACTION, coordObject, DIM
+from constants import POIS, POIS_TIMES, ACTION, coordObject, DIM, colors, metrics
 from utils import flatten_obstacles
 from POI import POI
 import matplotlib.pyplot as plt
 
-colors = ['b', 'g', 'r', 'c', 'm', 'k']
 
 def parseFile(fileName):
     file = open(fileName, 'r')
@@ -161,10 +160,9 @@ def evaluate(grid:list[list[ACTION]]):
     return results
 
 def evaluateOutputs():
-    partialGraph = {'Coverage':0,   'Collision':0,  'Obstacles':0,  'POIS':0}
-    finalGraph =   {'Coverage':[],  'Collision':[], 'Obstacles':[], 'POIS':[]}
+    finalGraph = {metric:[] for metric in metrics}
     for probToGoTarget in range(70,100):
-        partialGraph = {'Coverage':0,'Collision':0,'Obstacles':0,'POIS':0}
+        partialGraph = {metric:0 for metric in metrics}
         for i in range(1,10):
             fileToParse = 'output/'+str(probToGoTarget)+'/'+str(i)+'.txt'
             list = parseFile(fileToParse)
@@ -174,18 +172,15 @@ def evaluateOutputs():
         finalGraph = {k:finalGraph[k] + [partialGraph[k]/9] for k in partialGraph.keys()}
 
     bar_width = 0.2
-    fig = plt.figure()
-    ax = fig.add_axes([0,0,1,1])
+    plt.ylabel('Scores')
+    ax = plt.gca()
+    ax.get_xaxis().set_visible(False)
     index = 0
     for v in finalGraph.values():
         X = [i + index * bar_width for i in range(70,100)]
-        ax.bar(X, v , color = colors[index], width = bar_width)
+        plt.bar(X, v , color = colors[index], width = bar_width)
         index += 1
-    # print(finalGraph)
     plt.show()
-
-
-    
 
 
 if __name__ == '__main__':

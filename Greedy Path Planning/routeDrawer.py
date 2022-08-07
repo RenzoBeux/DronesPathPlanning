@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 from coordObject import coordObject
-from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES, POIS
+from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES, POIS, colors,markers
 from POI import POI
 from utils import readFileAction, flatten_obstacles
 from Obstacle import Obstacle
 
-colors = ['b', 'g', 'r', 'c', 'm', 'k']
-markers = ['o', '^', 'v']
+
 
 
 def calculateOffset(index):
@@ -81,7 +80,6 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
     Graphs using pyplot the trajectories of the UAVs, graphins simultaneosly each move of each drone
     """
     plt.figure()
-    print(dimensions.x)
     plt.xlim(-0.3, dimensions.x + 0.3)
     plt.ylim(-0.3, dimensions.y + 0.3)
     plt.grid(True)

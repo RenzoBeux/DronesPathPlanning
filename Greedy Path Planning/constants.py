@@ -39,6 +39,11 @@ class ACTION(Enum):
 
 P_SUCC = 0.8
 
+colors = ['b', 'g', 'r', 'c', 'm', 'k']
+markers = ['o', '^', 'v']
+
+metrics = ['Coverage','Collision','Obstacles','POIS']
+
 
 class OPERATION(Enum):
     Generate = 0
