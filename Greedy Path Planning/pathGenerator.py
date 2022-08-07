@@ -67,8 +67,8 @@ def runGreedy(id, successProbability):
         for uav in UAVList:
             needyPOI = uav.move([t, dims, needyPOI])
 
-        printMapGrid(UAVList, list(
-            map(lambda poi: poi.getSection(dims), POIList)), flatten_obstacles(dims))
+        # printMapGrid(UAVList, list(
+        #     map(lambda poi: poi.getSection(dims), POIList)), flatten_obstacles(dims))
 
     # i want the table to be sorted at the end
     UAVList.sort(key=lambda x: x.id)
