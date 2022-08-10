@@ -1,6 +1,6 @@
 from coordObject import coordObject
 from constants import ACTION, BIGDIM, DIM, ORIGIN, OBSTACLES
-from utils import readFileAction
+from utils import readFileAction, xDelta, yDelta, deltaToACTION
 from math import floor
 from routeDrawer import drawRouteAlt
 
@@ -26,51 +26,6 @@ def converter1(originalDim:coordObject,targetDim:coordObject,moves:list[ACTION])
             targCoord.x = newXCoord
             targCoord.y = newYCoord
     return result
-
-
-def xDelta(move:ACTION):
-    positives = [ACTION.DIAG_DOWN_RIGHT,ACTION.RIGHT,ACTION.DIAG_UP_RIGHT]
-    negatives = [ACTION.DIAG_DOWN_LEFT,ACTION.LEFT, ACTION.DIAG_UP_LEFT]
-    if move in positives:
-        return 1
-    elif move in negatives:
-        return -1
-    else:
-        return 0
-
-def yDelta(move:ACTION):
-    positives = [ACTION.DIAG_UP_RIGHT,ACTION.DIAG_UP_LEFT,ACTION.UP]
-    negatives = [ACTION.DIAG_DOWN_RIGHT,ACTION.DIAG_DOWN_LEFT, ACTION.DOWN]
-    if move in positives:
-        return 1
-    elif move in negatives:
-        return -1
-    else:
-        return 0
-
-def deltaToACTION(xDelta:int,yDelta:int)->ACTION:
-    if xDelta > 0:
-        if yDelta > 0:
-            return ACTION.DIAG_UP_RIGHT
-        elif yDelta < 0:
-            return ACTION.DIAG_DOWN_RIGHT
-        else:
-            return ACTION.RIGHT
-    elif xDelta < 0:
-        if yDelta > 0:
-            return ACTION.DIAG_UP_LEFT
-        elif yDelta < 0:
-            return ACTION.DIAG_DOWN_LEFT
-        else:
-            return ACTION.LEFT
-
-    if yDelta > 0:
-        return ACTION.UP
-    elif yDelta < 0:
-        return ACTION.DOWN
-    else:
-        return ACTION.STAY
-                
 
 def resizeRoute(name:str) -> list[list[ACTION]]:
     moves = readFileAction(name)

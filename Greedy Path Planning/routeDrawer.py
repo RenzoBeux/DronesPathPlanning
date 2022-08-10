@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from coordObject import coordObject
 from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES, POIS, colors,markers
 from POI import POI
-from utils import readFileAction, flatten_obstacles
+from utils import readFileAction, flatten_obstacles, xDelta, yDelta
 from Obstacle import Obstacle
 
 
@@ -139,35 +139,6 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
     timer = plt.annotate(
         str(t+1), [dimensions.x + 0.3, dimensions.y + 0.3], fontsize=22)
     plt.show()
-
-
-def xDelta(move: ACTION):
-    """
-    Calculates the shift an ACTION produces in the X axis
-    """
-    positives = [ACTION.DIAG_DOWN_RIGHT, ACTION.RIGHT, ACTION.DIAG_UP_RIGHT]
-    negatives = [ACTION.DIAG_DOWN_LEFT, ACTION.LEFT, ACTION.DIAG_UP_LEFT]
-    if move in positives:
-        return 1
-    elif move in negatives:
-        return -1
-    else:
-        return 0
-
-
-def yDelta(move: ACTION):
-    """
-    Calculates the shift an ACTION produces in the Y axis
-    """
-    positives = [ACTION.DIAG_UP_RIGHT, ACTION.DIAG_UP_LEFT, ACTION.UP]
-    negatives = [ACTION.DIAG_DOWN_RIGHT, ACTION.DIAG_DOWN_LEFT, ACTION.DOWN]
-    if move in positives:
-        return 1
-    elif move in negatives:
-        return -1
-    else:
-        return 0
-
 
 def interpretFile(name: str, poi: list[POI] = [], dimensions: coordObject = BIGDIM, origin: coordObject = coordObject(0, 0), obstacles: list[Obstacle] = OBSTACLES):
     routes = readFileAction(name)

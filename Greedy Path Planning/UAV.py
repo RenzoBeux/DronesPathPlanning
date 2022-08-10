@@ -2,6 +2,7 @@ from POI import POI
 from coordObject import coordObject
 from heuristics.ImoveHeuristic import moveHeuristic
 from constants import *
+from utils import collidesObstacle
 
 
 class UAV:
@@ -27,8 +28,15 @@ class UAV:
             return POI(coordObject(0, 0), 0, -1)
         return self.moveHeuristic.target
 
-    def possibleMoves(self):
-        result = []
+    # This function removes all ACTIONS from a list which would lead to an obstacle
+    def filterObstacles(self,moves:list[ACTION]) -> list[ACTION]:
+        result = list(filter(lambda mov:not collidesObstacle(mov,self.position,self.dims),moves))
+        return result
+        
+
+    def possibleMoves(self,avoidObs=True):
+        result:list[ACTION] = []
+        # Check for possible moves
         moveRight = self.position.x + 1 < self.dims.x
         moveDown = self.position.y - 1 >= 0
         moveLeft = self.position.x - 1 >= 0
@@ -52,34 +60,9 @@ class UAV:
                 result.append(ACTION.DIAG_UP_RIGHT)
 
         # Now we have to remove those actions that lead to an obstacle
-        for obstacle in self.obstacles:
-            for move in result:
-                if(move == ACTION.STAY):
-                    continue
-                if(move == ACTION.RIGHT):
-                    if(self.position.x + 1 == obstacle.x and self.position.y == obstacle.y):
-                        result.remove(ACTION.RIGHT)
-                if(move == ACTION.DIAG_DOWN_RIGHT):
-                    if(self.position.x + 1 == obstacle.x and self.position.y - 1 == obstacle.y):
-                        result.remove(ACTION.DIAG_DOWN_RIGHT)
-                if(move == ACTION.DOWN):
-                    if(self.position.x == obstacle.x and self.position.y - 1 == obstacle.y):
-                        result.remove(ACTION.DOWN)
-                if(move == ACTION.DIAG_DOWN_LEFT):
-                    if(self.position.x - 1 == obstacle.x and self.position.y - 1 == obstacle.y):
-                        result.remove(ACTION.DIAG_DOWN_LEFT)
-                if(move == ACTION.LEFT):
-                    if(self.position.x - 1 == obstacle.x and self.position.y == obstacle.y):
-                        result.remove(ACTION.LEFT)
-                if(move == ACTION.DIAG_UP_LEFT):
-                    if(self.position.x - 1 == obstacle.x and self.position.y + 1 == obstacle.y):
-                        result.remove(ACTION.DIAG_UP_LEFT)
-                if(move == ACTION.UP):
-                    if(self.position.x == obstacle.x and self.position.y + 1 == obstacle.y):
-                        result.remove(ACTION.UP)
-                if(move == ACTION.DIAG_UP_RIGHT):
-                    if(self.position.x + 1 == obstacle.x and self.position.y + 1 == obstacle.y):
-                        result.remove(ACTION.DIAG_UP_RIGHT)
+        if(avoidObs):
+            result = self.filterObstacles(result)
+
         return result
 
     def move(self, parameters: list[any]):
@@ -100,7 +83,7 @@ class UAV:
         else:
             self.battery -= 1
             parameters.append(self.position)
-            parameters.append(self.possibleMoves())
+            parameters.append(self.possibleMoves(avoidObs=False))
             move, needyPOI = self.moveHeuristic.getMove(parameters)
             self.shiftPosition(move)
             self.moves.append(move)
@@ -184,3 +167,4 @@ class UAV:
 
     def needCharge(self):
         return self.movesTowardBase() >= self.battery
+

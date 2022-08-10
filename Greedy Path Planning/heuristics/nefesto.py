@@ -30,13 +30,15 @@ class heuristic_nefesto(moveHeuristic):
             self.setTarget(needyPOI.pop())
         # Chose move accordingly
         if not self.isFree():
-            movesTowardsTargetPre: list[ACTION] = self.getMoveTowardsTarget(
-                position, dim)
+            movesTowardsTargetPre: list[ACTION] = self.getMoveTowardsTarget(position, dim)
             movesTowardsTarget = [value for value in movesTowardsTargetPre if value in possibleMoves]
+
+            movesToChoose = [*movesTowardsTarget,*possibleMoves]
+            selectedMove = choices(movesToChoose,[*[P_SUCC for _ in movesTowardsTarget],*[1-P_SUCC for _ in possibleMoves]],k=1)[0]
+
             posible = [*possibleMoves]
             targetMoves = [*movesTowardsTarget]
-            choiceList = choices([targetMoves, posible], [
-                                 self.succProb, 1-self.succProb])
+            choiceList = choices([targetMoves, posible], [self.succProb, 1-self.succProb])
             choice = choiceList[0]
             if (len(choice)-1 > 0):
                 randomNumber = randint(0, len(choice)-1)
