@@ -2,6 +2,7 @@ from heuristics.ImoveHeuristic import moveHeuristic
 from coordObject import coordObject
 from POI import POI
 from constants import *
+from utils import collidesObstacle
 
 from random import randint, choices
 
@@ -34,17 +35,8 @@ class heuristic_nefesto(moveHeuristic):
             movesTowardsTarget = [value for value in movesTowardsTargetPre if value in possibleMoves]
 
             movesToChoose = [*movesTowardsTarget,*possibleMoves]
-            selectedMove = choices(movesToChoose,[*[P_SUCC for _ in movesTowardsTarget],*[1-P_SUCC for _ in possibleMoves]],k=1)[0]
-
-            posible = [*possibleMoves]
-            targetMoves = [*movesTowardsTarget]
-            choiceList = choices([targetMoves, posible], [self.succProb, 1-self.succProb])
-            choice = choiceList[0]
-            if (len(choice)-1 > 0):
-                randomNumber = randint(0, len(choice)-1)
-            else:
-                randomNumber = 0
-            chosenMove = choice[randomNumber]
+            probs = [*[P_SUCC*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else P_SUCC for mov in movesTowardsTarget],*[(1-P_SUCC)*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else (1-P_SUCC) for mov in possibleMoves]]
+            chosenMove = choices(movesToChoose,probs,k=1)[0]
         else:
             randomNumber = randint(0, len(possibleMoves)-1)
             chosenMove = possibleMoves[randomNumber]

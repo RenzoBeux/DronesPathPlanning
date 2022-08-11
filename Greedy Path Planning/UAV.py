@@ -30,8 +30,7 @@ class UAV:
 
     # This function removes all ACTIONS from a list which would lead to an obstacle
     def filterObstacles(self,moves:list[ACTION]) -> list[ACTION]:
-        result = list(filter(lambda mov:not collidesObstacle(mov,self.position,self.dims),moves))
-        return result
+        return list(filter(lambda mov:not collidesObstacle(mov,self.position,self.dims),moves))
         
 
     def possibleMoves(self,avoidObs=True):

@@ -18,7 +18,7 @@ OBSTACLES = [
     Obstacle(coordObject(0.5, 0.5), coordObject(0.5, 0.5), 1),
     Obstacle(coordObject(0, 0.99), coordObject(0, 0.99), 2),
 ]
-OBS_AVOID_CHANCE=1
+OBS_PUNISH=1
 
 ORIGIN = coordObject(0,0)
 BATTERY_CAPACITY = 20
