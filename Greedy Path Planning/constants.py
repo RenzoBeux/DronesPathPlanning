@@ -9,7 +9,7 @@ from Obstacle import Obstacle
 DIM = coordObject(6, 6)
 BIGDIM = coordObject(18, 18)
 ORIGIN = coordObject(0, 0)
-UAVAMOUNT = 2
+UAVAMOUNT = 1
 TIMELENGTH = 50
 POIS = [coordObject(0.8, 0.8)]
 POIS_TIMES = [5]

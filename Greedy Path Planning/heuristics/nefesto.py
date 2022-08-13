@@ -24,6 +24,8 @@ class heuristic_nefesto(moveHeuristic):
         needyPOI: list[POI] = parameters[2]
         position: coordObject = parameters[3]
         possibleMoves: list[ACTION] = parameters[4]
+
+
         # Deal with target accordingly
         if(self.isOnTarget(position, dim)):
             self.removeTarget(time)
@@ -35,9 +37,12 @@ class heuristic_nefesto(moveHeuristic):
             movesTowardsTarget = [value for value in movesTowardsTargetPre if value in possibleMoves]
 
             movesToChoose = [*movesTowardsTarget,*possibleMoves]
-            probs = [*[P_SUCC*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else P_SUCC for mov in movesTowardsTarget],*[(1-P_SUCC)*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else (1-P_SUCC) for mov in possibleMoves]]
+            punish = 1-OBS_PUNISH
+            probs = [   *[P_SUCC*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else P_SUCC for mov in movesTowardsTarget],
+                        *[(1-P_SUCC)*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else (1-P_SUCC) for mov in possibleMoves]]
             chosenMove = choices(movesToChoose,probs,k=1)[0]
         else:
+
             randomNumber = randint(0, len(possibleMoves)-1)
             chosenMove = possibleMoves[randomNumber]
         return chosenMove, needyPOI
@@ -86,3 +91,7 @@ class heuristic_nefesto(moveHeuristic):
             if position.x < targetCoords.x:
                 results.append(ACTION.DIAG_UP_RIGHT)
         return results
+
+    # This function removes all ACTIONS from a list which would lead to an obstacle
+    def filterObstacles(self,moves:list[ACTION],position:coordObject,dims:coordObject) -> list[ACTION]:
+        return list(filter(lambda mov:not collidesObstacle(mov,position,dims),moves))

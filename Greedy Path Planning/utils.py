@@ -1,43 +1,6 @@
-from constants import ACTION, DIM, OBSTACLES
+from constants import ACTION, DIM, OBSTACLES,POIS,POIS_TIMES
 from coordObject import coordObject
-
-
-# def printMapGrid(drones: list[UAV], POIPos: list[coordObject], obstacles: list[coordObject]):
-#     for aux in range(DIM.y):
-#         if aux == 0:
-#             for x in range(DIM.x):
-#                 print('_______', end='')
-#         print()
-#         print()
-#         print('|    ', end='')
-#         # to print it in right order
-#         y = DIM.y - aux - 1
-#         for x in range(DIM.x):
-#             isPOI = [coords for coords in POIPos if (
-#                 coords.x == x and coords.y == y)] != []
-#             isObstacle = [coords for coords in obstacles if (
-#                 coords.x == x and coords.y == y)] != []
-#             filtered = list(filter(
-#                 lambda drone: x == drone.position.x and y == drone.position.y, drones))
-#             isDrone = list(filtered) != []
-#             if(isDrone):
-#                 for d in filtered:
-#                     print('D'+str(d.id), end='')
-#             if(isPOI):
-#                 print('P', end='')
-#             if(isObstacle):
-#                 print('O', end='')
-#             if(not isPOI and not isDrone and not isObstacle):
-#                 print('-', end='')
-#             # prints a tab
-#             print('    ', end='')
-#         print('|', end='')
-#         print('')
-#         if aux+1 == DIM.y:
-#             for x in range(DIM.x):
-#                 print('_______', end='')
-#         print()
-
+from POI import POI
 
 def readFileAction(fileName):
     """
@@ -53,6 +16,9 @@ def readFileAction(fileName):
     return result
 
 def flatten_obstacles(areaDims:coordObject)->list[coordObject]:
+    """
+    Returns a list of all of the coordinates which are considered occupied by obstacles
+    """
     obstaclesBySections:list[list[coordObject]] = list(map(lambda obs:obs.toSections(areaDims),OBSTACLES))
     flat_obs:list[coordObject] = []
     # Suboptimal as all hell
@@ -67,7 +33,10 @@ def flatten_obstacles(areaDims:coordObject)->list[coordObject]:
                 flat_obs.append(section)
     return flat_obs
 
-def collidesObstacle(action:ACTION,position:coordObject,dims=DIM):
+def collidesObstacle(action:ACTION,position:coordObject,dims=DIM)->bool:
+    """
+    Returns whether an action would lead to a collission with an obstacle
+    """
     obstacles = flatten_obstacles(dims)
     newX = position.x + xDelta(action)
     newY = position.y + yDelta(action)
@@ -89,7 +58,6 @@ def xDelta(move: ACTION):
     else:
         return 0
 
-
 def yDelta(move: ACTION):
     """
     Calculates the shift an ACTION produces in the Y axis
@@ -104,6 +72,9 @@ def yDelta(move: ACTION):
         return 0
 
 def deltaToACTION(xDelta:int,yDelta:int)->ACTION:
+    """
+    Given the delta an action makes to the x and y coordinates returns which action it is
+    """
     if xDelta > 0:
         if yDelta > 0:
             return ACTION.DIAG_UP_RIGHT
@@ -125,3 +96,9 @@ def deltaToACTION(xDelta:int,yDelta:int)->ACTION:
         return ACTION.DOWN
     else:
         return ACTION.STAY
+
+def getListOfPois()->list[POI]:
+    """
+    Returns a list of POI objects, for all of the POIs in the scenario
+    """
+    return [POI(coord,POIS_TIMES[i],i) for i, coord in enumerate(POIS)]

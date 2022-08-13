@@ -2,7 +2,7 @@ from POI import POI
 from coordObject import coordObject
 from heuristics.ImoveHeuristic import moveHeuristic
 from constants import *
-from utils import collidesObstacle
+from utils import xDelta, yDelta
 
 
 class UAV:
@@ -24,16 +24,17 @@ class UAV:
         self.id = id
 
     def getTarget(self):
+        """
+        THIS HAS TO BE DEPRECATED. TARGETS ARE HEURISTIC LEVEL
+        """
         if (self.moveHeuristic.target == None):
             return POI(coordObject(0, 0), 0, -1)
         return self.moveHeuristic.target
 
-    # This function removes all ACTIONS from a list which would lead to an obstacle
-    def filterObstacles(self,moves:list[ACTION]) -> list[ACTION]:
-        return list(filter(lambda mov:not collidesObstacle(mov,self.position,self.dims),moves))
-        
-
-    def possibleMoves(self,avoidObs=True):
+    def possibleMoves(self):
+        """
+        Returns all possile moves. Even those that collide with obstacles
+        """
         result:list[ACTION] = []
         # Check for possible moves
         moveRight = self.position.x + 1 < self.dims.x
@@ -58,13 +59,12 @@ class UAV:
             if(moveRight):
                 result.append(ACTION.DIAG_UP_RIGHT)
 
-        # Now we have to remove those actions that lead to an obstacle
-        if(avoidObs):
-            result = self.filterObstacles(result)
-
         return result
 
     def move(self, parameters: list[any]):
+        """
+        Either moves according to its heuristic, or it moves towards its charging port
+        """
         if (self.charging):
             self.chargingTime -= 1
             if (self.chargingTime == 0):
@@ -89,28 +89,11 @@ class UAV:
             return needyPOI
 
     def shiftPosition(self, chosenMove: ACTION):
-        if chosenMove == ACTION.STAY:
-            pass
-        elif chosenMove == ACTION.RIGHT:
-            self.position.x = self.position.x + 1
-        elif chosenMove == ACTION.DIAG_DOWN_RIGHT:
-            self.position.x = self.position.x + 1
-            self.position.y = self.position.y - 1
-        elif chosenMove == ACTION.DOWN:
-            self.position.y = self.position.y - 1
-        elif chosenMove == ACTION.DIAG_DOWN_LEFT:
-            self.position.y = self.position.y - 1
-            self.position.x = self.position.x - 1
-        elif chosenMove == ACTION.LEFT:
-            self.position.x = self.position.x - 1
-        elif chosenMove == ACTION.DIAG_UP_LEFT:
-            self.position.x = self.position.x - 1
-            self.position.y = self.position.y + 1
-        elif chosenMove == ACTION.UP:
-            self.position.y = self.position.y + 1
-        elif chosenMove == ACTION.DIAG_UP_RIGHT:
-            self.position.y = self.position.y + 1
-            self.position.x = self.position.x + 1
+        """
+        Shifts the position of the drone according to move disregarding everything
+        """
+        self.position.x += xDelta(chosenMove)
+        self.position.y += yDelta(chosenMove)
 
     def valuesArray(self):
         values = []
@@ -119,11 +102,14 @@ class UAV:
         return values
 
     def moveToCharge(self) -> ACTION:
+        """
+        Moves to charge fully avoiding obstacles
+        """
         targetCoords: coordObject = coordObject(0, 0)
         results: list[ACTION] = []
         position = self.position
         # if im on target the return stay
-        if(self.position.x == 0 and self.position.y == 0):
+        if(self.position.x == ORIGIN.x and self.position.y == ORIGIN.y):
             results.append(ACTION.STAY)
             return ACTION.STAY
         if position.x < targetCoords.x:
@@ -154,16 +140,21 @@ class UAV:
         # if there is no diagonal move, return the first move
         return process[0]
 
-# This function returns the number of moves towards cordObject(0,0)
     def movesTowardBase(self):
+        """
+        Returns the number of moves towards ORIGIN
+        """
         counter = 0
         auxUAV = UAV(self.dims, coordObject(self.position.x,
                      self.position.y), self.obstaclesRaw, None, -1)
-        while (auxUAV.position.x != 0 or auxUAV.position.y != 0):
+        while (auxUAV.position.x != ORIGIN.x or auxUAV.position.y != ORIGIN.y):
             auxUAV.shiftPosition(auxUAV.moveToCharge())
             counter += 1
         return counter
 
     def needCharge(self):
+        """
+        Returns whether the UAV should be moving towards the charging port
+        """
         return self.movesTowardBase() >= self.battery
 

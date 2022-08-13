@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from coordObject import coordObject
 from constants import ACTION, BIGDIM, DIM, PAUSE_TIME, OBSTACLES, POIS, colors,markers
 from POI import POI
-from utils import readFileAction, flatten_obstacles, xDelta, yDelta
+from utils import readFileAction, flatten_obstacles, xDelta, yDelta, getListOfPois
 from Obstacle import Obstacle
 
 
@@ -140,7 +140,7 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
         str(t+1), [dimensions.x + 0.3, dimensions.y + 0.3], fontsize=22)
     plt.show()
 
-def interpretFile(name: str, poi: list[POI] = [], dimensions: coordObject = BIGDIM, origin: coordObject = coordObject(0, 0), obstacles: list[Obstacle] = OBSTACLES):
+def interpretFile(name: str, poi: list[POI] = getListOfPois(), dimensions: coordObject = BIGDIM, origin: coordObject = coordObject(0, 0), obstacles: list[Obstacle] = OBSTACLES):
     routes = readFileAction(name)
     drawRouteAlt(dimensions, poi, origin, obstacles, routes)
 
