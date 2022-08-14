@@ -37,14 +37,21 @@ class heuristic_nefesto(moveHeuristic):
             movesTowardsTarget = [value for value in movesTowardsTargetPre if value in possibleMoves]
 
             movesToChoose = [*movesTowardsTarget,*possibleMoves]
-            punish = 1-OBS_PUNISH
-            probs = [   *[P_SUCC*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else P_SUCC for mov in movesTowardsTarget],
-                        *[(1-P_SUCC)*(1-OBS_PUNISH) if collidesObstacle(mov,position,dim) else (1-P_SUCC) for mov in possibleMoves]]
+
+            probToTarg, probToTargPunished = self.getProbForMoves(P_SUCC,movesTowardsTarget,position,dim)
+            probNotTarg, probNotTargPunished = self.getProbForMoves(1-P_SUCC,possibleMoves,position,dim)
+
+            probs = [   *[probToTargPunished if collidesObstacle(mov,position,dim) else probToTarg for mov in movesTowardsTarget],
+                        *[probNotTarg if collidesObstacle(mov,position,dim) else probNotTargPunished for mov in possibleMoves]]
             chosenMove = choices(movesToChoose,probs,k=1)[0]
         else:
+            probForMove, probForMovePunished = self.getProbForMoves(1,possibleMoves,position,dim)
+            
+            chosenMove = choices(possibleMoves,[probForMovePunished if collidesObstacle(mov,position,dim) else probForMove for mov in possibleMoves],k=1)[0]
 
-            randomNumber = randint(0, len(possibleMoves)-1)
-            chosenMove = possibleMoves[randomNumber]
+
+            # randomNumber = randint(0, len(possibleMoves)-1)
+            # chosenMove = possibleMoves[randomNumber]
         return chosenMove, needyPOI
 
     def setTarget(self, target: POI):
@@ -92,6 +99,17 @@ class heuristic_nefesto(moveHeuristic):
                 results.append(ACTION.DIAG_UP_RIGHT)
         return results
 
-    # This function removes all ACTIONS from a list which would lead to an obstacle
-    def filterObstacles(self,moves:list[ACTION],position:coordObject,dims:coordObject) -> list[ACTION]:
-        return list(filter(lambda mov:not collidesObstacle(mov,position,dims),moves))
+    def getProbForMoves(self,totalProb:float,moves:list[ACTION],position:coordObject,dims:coordObject) -> tuple[float,float]:
+        """
+        Returns the pair of values of the regular probability of a move, and the probability of a punished move 
+        """
+        probPerMove = totalProb / len(moves)
+        amountTowardsObs = len(list(filter(lambda mov: collidesObstacle(mov,position,dims),moves)))
+        amountNotToObs = len(moves) - amountTowardsObs
+        lostProbDueToObs = probPerMove * OBS_PUNISH
+        totalLostProb = lostProbDueToObs * amountTowardsObs
+
+        punishedProb = probPerMove * (1-OBS_PUNISH)
+        regularProb = probPerMove + totalLostProb / amountNotToObs
+
+        return regularProb, punishedProb 

@@ -2,7 +2,7 @@ from POI import POI
 from coordObject import coordObject
 from heuristics.ImoveHeuristic import moveHeuristic
 from constants import *
-from utils import xDelta, yDelta
+from utils import xDelta, yDelta, collidesObstacle
 
 
 class UAV:
@@ -82,7 +82,7 @@ class UAV:
         else:
             self.battery -= 1
             parameters.append(self.position)
-            parameters.append(self.possibleMoves(avoidObs=False))
+            parameters.append(self.possibleMoves())
             move, needyPOI = self.moveHeuristic.getMove(parameters)
             self.shiftPosition(move)
             self.moves.append(move)
@@ -129,16 +129,19 @@ class UAV:
             if position.x < targetCoords.x:
                 results.append(ACTION.DIAG_UP_RIGHT)
 
-        process = [value for value in results if value in self.possibleMoves()]
+        legalMoves = [value for value in results if value in self.possibleMoves()]
+        movesNotObstacles = self.filterObstacles(legalMoves,self.position,self.dims)
+
+
         def premise(x): return x in [
             ACTION.DIAG_DOWN_RIGHT, ACTION.DIAG_DOWN_LEFT, ACTION.DIAG_UP_LEFT, ACTION.DIAG_UP_RIGHT]
         # if there is a diagonal move, return it
-        if(len(process) > 0):
-            for move in process:
+        if(len(movesNotObstacles) > 0):
+            for move in movesNotObstacles:
                 if(premise(move)):
                     return move
         # if there is no diagonal move, return the first move
-        return process[0]
+        return movesNotObstacles[0]
 
     def movesTowardBase(self):
         """
@@ -158,3 +161,8 @@ class UAV:
         """
         return self.movesTowardBase() >= self.battery
 
+    def filterObstacles(self,moves:list[ACTION],position:coordObject,dims:coordObject) -> list[ACTION]:
+        """
+        Removes all ACTIONS from a list which would lead to an obstacle
+        """
+        return list(filter(lambda mov:not collidesObstacle(mov,position,dims),moves))
