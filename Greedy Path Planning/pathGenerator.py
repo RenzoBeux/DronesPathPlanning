@@ -1,6 +1,7 @@
+from math import ceil
 import os
 from Obstacle import Obstacle
-from constants import ACTION, DIM, OBSTACLES, POIS, POIS_TIMES, UAVAMOUNT, TIMELENGTH, BIGDIM
+from constants import ACTION, BATTERY_CAPACITY, DIM, OBSTACLES, POIS, POIS_TIMES, UAVAMOUNT, TIMELENGTH, BIGDIM
 from random import randint, random, seed, shuffle
 from coordObject import coordObject
 from POI import POI
@@ -53,8 +54,18 @@ def runGreedy(id, successProbability):
 
     # add randomness to UAV picking POIs
     shuffle(UAVList)
+
+    # qty, rem = divmod(len(UAVList), 4)
+    # group1 = UAVList[:(qty+rem)]
+    # group2 = UAVList[(qty+rem):(2*qty+rem)]
+    # group3 = UAVList[(2*qty+rem):(3*qty+rem)]
+    # group4 = UAVList[(3*qty+rem):]
     # Creation of the routes
+    UAVList[0].setIsOn(True)
+    turnOnProbability = 0.05
     for t in range(TIMELENGTH):
+        # increase turnOnProbability exponentially
+        turnOnProbability = turnOnProbability * 1.1
         print('TIME:', t)
         # print(UAVList[0].position.x, ' ', UAVList[0].position.y)
         for poi in POIList:
@@ -65,6 +76,9 @@ def runGreedy(id, successProbability):
             if (flag and not(poi in needyPOI) and (t - poi.lastVisit > poi.expectedVisitTime)):
                 needyPOI.append(poi)
         for uav in UAVList:
+            # Randomly have a chance to set the uav on if it is off
+            if (not(uav.isOn) and random() < turnOnProbability):
+                uav.setIsOn(True)
             needyPOI = uav.move([t, dims, needyPOI])
 
         # printMapGrid(UAVList, list(

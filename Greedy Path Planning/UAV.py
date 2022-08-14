@@ -22,6 +22,7 @@ class UAV:
         self.charging = False
         self.chargingTime = TIME_TO_CHARGE
         self.id = id
+        self.isOn = False
 
     def getTarget(self):
         """
@@ -35,7 +36,7 @@ class UAV:
         """
         Returns all possile moves. Even those that collide with obstacles
         """
-        result:list[ACTION] = []
+        result: list[ACTION] = []
         # Check for possible moves
         moveRight = self.position.x + 1 < self.dims.x
         moveDown = self.position.y - 1 >= 0
@@ -61,17 +62,33 @@ class UAV:
 
         return result
 
+    # def stay(self):
+    #     """
+    #     Adds STAY action to moves list, if it is in base then charge
+    #     """
+    #     if (self.charging):
+    #         self.chargingTime -= 1
+    #         if (self.chargingTime == 0):
+    #             self.charging = False
+    #             self.battery = BATTERY_CAPACITY
+    #     return self.moves.append(ACTION.STAY)
+
     def move(self, parameters: list[any]):
         """
         Either moves according to its heuristic, or it moves towards its charging port
         """
+        if(not self.isOn):
+            self.moves.append(ACTION.STAY)
+            return parameters[2]  # returneo el needy poi como me vino
         if (self.charging):
             self.chargingTime -= 1
             if (self.chargingTime == 0):
                 self.charging = False
                 self.battery = BATTERY_CAPACITY
-                return parameters[2]  # returneo el needy poi como me vino
+            self.moves.append(ACTION.STAY)        
+            return parameters[2]  # returneo el needy poi como me vino
         if (self.needCharge()):
+            self.moveHeuristic.setTarget(POI(ORIGIN, 0, -1))
             move = self.moveToCharge()
             if (move == ACTION.STAY):
                 self.charging = True
@@ -129,9 +146,10 @@ class UAV:
             if position.x < targetCoords.x:
                 results.append(ACTION.DIAG_UP_RIGHT)
 
-        legalMoves = [value for value in results if value in self.possibleMoves()]
-        movesNotObstacles = self.filterObstacles(legalMoves,self.position,self.dims)
-
+        legalMoves = [
+            value for value in results if value in self.possibleMoves()]
+        movesNotObstacles = self.filterObstacles(
+            legalMoves, self.position, self.dims)
 
         def premise(x): return x in [
             ACTION.DIAG_DOWN_RIGHT, ACTION.DIAG_DOWN_LEFT, ACTION.DIAG_UP_LEFT, ACTION.DIAG_UP_RIGHT]
@@ -161,8 +179,11 @@ class UAV:
         """
         return self.movesTowardBase() >= self.battery
 
-    def filterObstacles(self,moves:list[ACTION],position:coordObject,dims:coordObject) -> list[ACTION]:
+    def filterObstacles(self, moves: list[ACTION], position: coordObject, dims: coordObject) -> list[ACTION]:
         """
         Removes all ACTIONS from a list which would lead to an obstacle
         """
-        return list(filter(lambda mov:not collidesObstacle(mov,position,dims),moves))
+        return list(filter(lambda mov: not collidesObstacle(mov, position, dims), moves))
+
+    def setIsOn(self, isOn: bool):
+        self.isOn = isOn

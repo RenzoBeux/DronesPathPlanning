@@ -114,7 +114,7 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
                 positions[index].x = moveEnd.x
                 positions[index].y = moveEnd.y
                 tempPos.append(plt.scatter(
-                    moveEnd.x, moveEnd.y, marker=markers[index], color=colors[index], s=100))
+                    moveEnd.x, moveEnd.y, marker=markers[0], color=colors[index], s=100))
                 if move == ACTION.STAY:
                     plt.scatter(moveEnd.x, moveEnd.y, s=80,
                                 facecolors='none', edgecolors=colors[index])

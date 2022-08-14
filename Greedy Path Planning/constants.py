@@ -9,8 +9,8 @@ from Obstacle import Obstacle
 DIM = coordObject(6, 6)
 BIGDIM = coordObject(18, 18)
 ORIGIN = coordObject(0, 0)
-UAVAMOUNT = 2
-TIMELENGTH = 50
+UAVAMOUNT = 6
+TIMELENGTH = 80
 POIS = [coordObject(0.8, 0.8)]
 POIS_TIMES = [5]
 OBSTACLES = [
@@ -18,13 +18,14 @@ OBSTACLES = [
     Obstacle(coordObject(0.5, 0.5), coordObject(0.5, 0.5), 1),
     Obstacle(coordObject(0, 0.99), coordObject(0, 0.99), 2),
 ]
-OBS_PUNISH=0.2
+OBS_PUNISH = 0.8
 
-ORIGIN = coordObject(0,0)
-BATTERY_CAPACITY = 20
-TIME_TO_CHARGE = 20
+ORIGIN = coordObject(0, 0)
+# Time to charge must be aprox 2.5 times the BATTERY_CAPACITY
+BATTERY_CAPACITY = 15
+TIME_TO_CHARGE = 37
 
-PAUSE_TIME = 0.2
+PAUSE_TIME = 0.5
 
 
 class ACTION(Enum):
@@ -42,9 +43,10 @@ class ACTION(Enum):
 P_SUCC = 0.8
 
 colors = ['b', 'g', 'r', 'c', 'm', 'k']
-markers = ['o', '^', 'v']
+markers = ['o', '^', 'v', '<', '>', 's',
+           'p', '*', 'h', 'H', 'D', 'd', 'P', 'X']
 
-metrics = ['Coverage','Collision','Obstacles','POIS']
+metrics = ['Coverage', 'Collision', 'Obstacles', 'POIS']
 
 
 class OPERATION(Enum):

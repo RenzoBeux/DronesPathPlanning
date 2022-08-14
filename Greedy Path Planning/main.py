@@ -20,10 +20,10 @@ if __name__ == "__main__":
         args = parser.parse_args()
         # Create dataset
         if (args.task == 'create'):
-            runGreedy(1,90/100)
-            # for k in range(70, 100):
-            #     for i in range(1, 10):
-            #         runGreedy(i, k/100)
+            # runGreedy(1,90/100)
+            for k in range(70, 100):
+                for i in range(1, 10):
+                    runGreedy(i, k/100)
         # Print UAVs flight
         elif (args.task == 'print'):
             interpretFile(args.file, dimensions=DIM)
@@ -42,4 +42,5 @@ if __name__ == "__main__":
             print("Invalid operation")
             print("Valid operations are ")
     except IndexError as err:
-        print(err)
+        print(
+            err.with_traceback(err))
