@@ -25,7 +25,6 @@ class heuristic_nefesto(moveHeuristic):
         position: coordObject = parameters[3]
         possibleMoves: list[ACTION] = parameters[4]
 
-
         # Deal with target accordingly
         if(self.isOnTarget(position, dim)):
             self.removeTarget(time)
@@ -33,22 +32,27 @@ class heuristic_nefesto(moveHeuristic):
             self.setTarget(needyPOI.pop())
         # Chose move accordingly
         if not self.isFree():
-            movesTowardsTargetPre: list[ACTION] = self.getMoveTowardsTarget(position, dim)
-            movesTowardsTarget = [value for value in movesTowardsTargetPre if value in possibleMoves]
+            movesTowardsTargetPre: list[ACTION] = self.getMoveTowardsTarget(
+                position, dim)
+            movesTowardsTarget = [
+                value for value in movesTowardsTargetPre if value in possibleMoves]
 
-            movesToChoose = [*movesTowardsTarget,*possibleMoves]
+            movesToChoose = [*movesTowardsTarget, *possibleMoves]
 
-            probToTarg, probToTargPunished = self.getProbForMoves(P_SUCC,movesTowardsTarget,position,dim)
-            probNotTarg, probNotTargPunished = self.getProbForMoves(1-P_SUCC,possibleMoves,position,dim)
+            probToTarg, probToTargPunished = self.getProbForMoves(
+                self.succProb, movesTowardsTarget, position, dim)
+            probNotTarg, probNotTargPunished = self.getProbForMoves(
+                1-self.succProb, possibleMoves, position, dim)
 
-            probs = [   *[probToTargPunished if collidesObstacle(mov,position,dim) else probToTarg for mov in movesTowardsTarget],
-                        *[probNotTarg if collidesObstacle(mov,position,dim) else probNotTargPunished for mov in possibleMoves]]
-            chosenMove = choices(movesToChoose,probs,k=1)[0]
+            probs = [*[probToTargPunished if collidesObstacle(mov, position, dim) else probToTarg for mov in movesTowardsTarget],
+                     *[probNotTarg if collidesObstacle(mov, position, dim) else probNotTargPunished for mov in possibleMoves]]
+            chosenMove = choices(movesToChoose, probs, k=1)[0]
         else:
-            probForMove, probForMovePunished = self.getProbForMoves(1,possibleMoves,position,dim)
-            
-            chosenMove = choices(possibleMoves,[probForMovePunished if collidesObstacle(mov,position,dim) else probForMove for mov in possibleMoves],k=1)[0]
+            probForMove, probForMovePunished = self.getProbForMoves(
+                1, possibleMoves, position, dim)
 
+            chosenMove = choices(possibleMoves, [probForMovePunished if collidesObstacle(
+                mov, position, dim) else probForMove for mov in possibleMoves], k=1)[0]
 
             # randomNumber = randint(0, len(possibleMoves)-1)
             # chosenMove = possibleMoves[randomNumber]
@@ -99,12 +103,13 @@ class heuristic_nefesto(moveHeuristic):
                 results.append(ACTION.DIAG_UP_RIGHT)
         return results
 
-    def getProbForMoves(self,totalProb:float,moves:list[ACTION],position:coordObject,dims:coordObject) -> tuple[float,float]:
+    def getProbForMoves(self, totalProb: float, moves: list[ACTION], position: coordObject, dims: coordObject) -> tuple[float, float]:
         """
         Returns the pair of values of the regular probability of a move, and the probability of a punished move 
         """
         probPerMove = totalProb / len(moves)
-        amountTowardsObs = len(list(filter(lambda mov: collidesObstacle(mov,position,dims),moves)))
+        amountTowardsObs = len(
+            list(filter(lambda mov: collidesObstacle(mov, position, dims), moves)))
         amountNotToObs = len(moves) - amountTowardsObs
         lostProbDueToObs = probPerMove * OBS_PUNISH
         totalLostProb = lostProbDueToObs * amountTowardsObs
@@ -112,4 +117,4 @@ class heuristic_nefesto(moveHeuristic):
         punishedProb = probPerMove * (1-OBS_PUNISH)
         regularProb = probPerMove + totalLostProb / amountNotToObs
 
-        return regularProb, punishedProb 
+        return regularProb, punishedProb

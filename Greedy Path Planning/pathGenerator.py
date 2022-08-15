@@ -42,6 +42,7 @@ def runGreedy(id, successProbability):
     UAVList: list[UAV] = []
     needyPOI: list[POI] = []
     obstacles: list[Obstacle] = OBSTACLES
+    # print(successProbability)
     # POI and UAV creation
     for i in range(len(POIPosition)):
         currPOI = POI(POIPosition[i], POITimes[i], i)
@@ -66,7 +67,7 @@ def runGreedy(id, successProbability):
     for t in range(TIMELENGTH):
         # increase turnOnProbability exponentially
         turnOnProbability = turnOnProbability * 1.1
-        print('TIME:', t)
+        # print('TIME:', t)
         # print(UAVList[0].position.x, ' ', UAVList[0].position.y)
         for poi in POIList:
             flag = True

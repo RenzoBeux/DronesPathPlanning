@@ -39,14 +39,11 @@ class ACTION(Enum):
     UP = 7
     DIAG_UP_RIGHT = 8
 
-
-P_SUCC = 0.8
-
 colors = ['b', 'g', 'r', 'c', 'm', 'k']
 markers = ['o', '^', 'v', '<', '>', 's',
            'p', '*', 'h', 'H', 'D', 'd', 'P', 'X']
 
-metrics = ['Coverage', 'Collision', 'Obstacles', 'POIS']
+metrics = ['Coverage', 'Collision', 'Obstacles', 'POIS', 'Uptime']
 
 
 class OPERATION(Enum):
