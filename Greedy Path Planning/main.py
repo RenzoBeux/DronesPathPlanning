@@ -27,16 +27,16 @@ if __name__ == "__main__":
         # Print UAVs flight
         elif (args.task == 'print'):
             interpretFile(args.file, dimensions=DIM)
-        elif (int(argv[1]) == 2):
-            POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
-            POITimes = [2, 5]
-            POIList: list[POI] = []
-            for i in range(len(POIPosition)):
-                currPOI = POI(POIPosition[i], POITimes[i], i)
-                POIList.append(currPOI)
-            newRoutes = resizeRoute('1.txt')
-            drawRouteAlt(DIM, POIList, coordObject(0, 0), [], newRoutes)
-        elif(int(argv[1]) == 3):
+        # elif (int(argv[1]) == 2):
+        #     POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
+        #     POITimes = [2, 5]
+        #     POIList: list[POI] = []
+        #     for i in range(len(POIPosition)):
+        #         currPOI = POI(POIPosition[i], POITimes[i], i)
+        #         POIList.append(currPOI)
+        #     newRoutes = resizeRoute('1.txt')
+        #     drawRouteAlt(DIM, POIList, coordObject(0, 0), [], newRoutes)
+        elif(args.task == 'evaluate'):
             evaluateOutputs()
         else:
             print("Invalid operation")
