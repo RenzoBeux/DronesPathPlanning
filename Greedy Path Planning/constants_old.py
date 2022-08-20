@@ -20,7 +20,6 @@ OBSTACLES = [
 ]
 OBS_PUNISH = 0.8
 
-ORIGIN = coordObject(0, 0)
 # Time to charge must be aprox 2.5 times the BATTERY_CAPACITY
 BATTERY_CAPACITY = 15
 TIME_TO_CHARGE = 37

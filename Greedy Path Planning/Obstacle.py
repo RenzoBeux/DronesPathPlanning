@@ -8,7 +8,7 @@ class Obstacle:
         self.dimsEnd = dimsEnd
         self.id = id
 
-    def toSections(self, gridDimensions:coordObject) -> list[coordObject]:
+    def toSections(self, gridDimensions: coordObject) -> list[coordObject]:
         sections = []
         percentageOfSectionInitX = gridDimensions.x * self.dimsInit.x
         percentageOfSectionEndX = gridDimensions.x * self.dimsEnd.x
@@ -18,7 +18,7 @@ class Obstacle:
         sectionEndX = int(percentageOfSectionEndX)
         sectionInitY = int(percentageOfSectionInitY)
         sectionEndY = int(percentageOfSectionEndY)
-        for i in range(sectionInitX, sectionEndX + 1):
-            for j in range(sectionInitY, sectionEndY + 1):
+        for i in range(sectionInitX, sectionEndX):
+            for j in range(sectionInitY, sectionEndY):
                 sections.append(coordObject(i, j))
         return sections
