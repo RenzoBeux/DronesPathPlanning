@@ -111,6 +111,8 @@ class heuristic_nefesto(moveHeuristic):
         amountTowardsObs = len(
             list(filter(lambda mov: collidesObstacle(mov, position, dims), moves)))
         amountNotToObs = len(moves) - amountTowardsObs
+        if amountNotToObs == 0: #TODO
+            return 0, probPerMove
         lostProbDueToObs = probPerMove * OBS_PUNISH
         totalLostProb = lostProbDueToObs * amountTowardsObs
 
