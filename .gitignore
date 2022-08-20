@@ -1,6 +1,4 @@
 
-GreedyPathPlanning/__pycache__/
+output/
 
-GreedyPathPlanning/heuristics/__pycache__/
-
-GreedyPathPlanning/output/
+__pycache__/
