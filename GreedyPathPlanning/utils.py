@@ -2,7 +2,7 @@ from constants import ACTION, DIM, OBSTACLES,POIS,POIS_TIMES
 from coordObject import coordObject
 from POI import POI
 
-def readFileAction(fileName):
+def readFileAction(fileName:str)-> list[list[ACTION]]:
     """
     Reads a file and interprets it as a list of sequences of ACTIONs
     """
