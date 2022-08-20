@@ -18,7 +18,7 @@ class Obstacle:
         sectionEndX = int(percentageOfSectionEndX)
         sectionInitY = int(percentageOfSectionInitY)
         sectionEndY = int(percentageOfSectionEndY)
-        for i in range(sectionInitX, sectionEndX):
-            for j in range(sectionInitY, sectionEndY):
+        for i in range(sectionInitX, sectionEndX+1):
+            for j in range(sectionInitY, sectionEndY+1):
                 sections.append(coordObject(i, j))
         return sections

@@ -63,7 +63,7 @@ def runGreedy(id, successProbability):
     # group4 = UAVList[(3*qty+rem):]
     # Creation of the routes
     UAVList[0].setIsOn(True)
-    turnOnProbability = 0.05
+    turnOnProbability = 0.01
     for t in range(TIMELENGTH):
         # increase turnOnProbability exponentially
         turnOnProbability = turnOnProbability * 1.1
