@@ -1,6 +1,7 @@
 from utils import readFileAction
 from evaluator import evaluate
 from tensorflow import keras
+from keras import Model,Sequential
 
 def parseInputs():
     x_train = []
@@ -17,15 +18,17 @@ def parseInputs():
             x_train.append(setOfRoutes)
             y_train.append(score) 
 
-class CGAN(keras.Model):
-    def __init__(self,discriminator,generator):
+class CGAN(Model):
+    def __init__(self,discriminator:Sequential,generator:Sequential):
         super(CGAN,self).__init__()
         self.discriminator = discriminator
         self.generator = generator
 
     def compile(self,d_optimizer,g_optimizer,loss_fn):
         super(CGAN,self).compile()
-        self.d_optimizer = d_optimizer
-        self.g_optimizer = g_optimizer
-        self.loss_fn = loss_fn
+        # self.d_optimizer = d_optimizer
+        # self.g_optimizer = g_optimizer
+        # self.loss_fn = loss_fn
     
+    def train_step(self, data):
+        generated_routes = self.generator()
