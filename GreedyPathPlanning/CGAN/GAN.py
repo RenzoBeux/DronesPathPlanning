@@ -1,7 +1,9 @@
+from GreedyPathPlanning.CGAN.discriminator import Discriminator
+from GreedyPathPlanning.CGAN.generator import Generator
+from keras.models import Sequential
+from keras.optimizers import Adam
 from utils import readFileAction
 from evaluator import evaluate
-from tensorflow import keras
-from keras import Model,Sequential
 
 def parseInputs():
     x_train = []
@@ -18,17 +20,9 @@ def parseInputs():
             x_train.append(setOfRoutes)
             y_train.append(score) 
 
-class CGAN(Model):
-    def __init__(self,discriminator:Sequential,generator:Sequential):
-        super(CGAN,self).__init__()
-        self.discriminator = discriminator
-        self.generator = generator
-
-    def compile(self,d_optimizer,g_optimizer,loss_fn):
-        super(CGAN,self).compile()
-        # self.d_optimizer = d_optimizer
-        # self.g_optimizer = g_optimizer
-        # self.loss_fn = loss_fn
-    
-    def train_step(self, data):
-        generated_routes = self.generator()
+class CGAN():
+    def __init__(self):
+        self.discriminator = Sequential()
+        self.discriminator.compile(loss=['binary_crossentropy'],optimizer=Adam(0.0002, 0.5),metrics=['acurracy'])
+        self.generator = Generator()
+        pass
