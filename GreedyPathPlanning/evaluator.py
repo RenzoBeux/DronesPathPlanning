@@ -5,8 +5,11 @@ from utils import flatten_obstacles
 from POI import POI
 import matplotlib.pyplot as plt
 
+class InvalidRoute(Exception):
+    pass
 
-def parseFile(fileName):
+
+def parseFile(fileName) -> list[list[int]]:
     file = open(fileName, 'r')
     res = []
     for line in file:
@@ -26,48 +29,51 @@ def parseMoves(listOfLists: list[list[int]]) -> list[ACTION]:
 
 
 def populateArea(actions: list[list[ACTION]], areaDims: coordObject) -> list[list[list[int]]]:
-    # res will have areadims.x * areadims.y elements
-    res: list[list[list[int]]] = []
-    # initialize res with 0s
-    for i in range(areaDims.x):
-        res.append([])
-        for j in range(areaDims.y):
-            res[i].append([])
-    # here we will store current pos for each drone
-    currentPos: list[coordObject] = []
-    # for each drone we will initialize his current point in 0,0
-    for i in range(len(actions)):
-        currentPos.append(coordObject(0, 0))
-    # we mark the initial point of each drone as visited
-    for i in range(len(actions)):
-        res[currentPos[i].x][currentPos[i].y].append(0)
-    # for each drone
-    for i in range(len(actions)):
-        # we will iterate through the actions
-        for j in range(len(actions[i])):
-            chosenMove = actions[i][j]
-            if chosenMove == ACTION.RIGHT:
-                currentPos[i].x = currentPos[i].x + 1
-            elif chosenMove == ACTION.DIAG_DOWN_RIGHT:
-                currentPos[i].x = currentPos[i].x + 1
-                currentPos[i].y = currentPos[i].y - 1
-            elif chosenMove == ACTION.DOWN:
-                currentPos[i].y = currentPos[i].y - 1
-            elif chosenMove == ACTION.DIAG_DOWN_LEFT:
-                currentPos[i].y = currentPos[i].y - 1
-                currentPos[i].x = currentPos[i].x - 1
-            elif chosenMove == ACTION.LEFT:
-                currentPos[i].x = currentPos[i].x - 1
-            elif chosenMove == ACTION.DIAG_UP_LEFT:
-                currentPos[i].x = currentPos[i].x - 1
-                currentPos[i].y = currentPos[i].y + 1
-            elif chosenMove == ACTION.UP:
-                currentPos[i].y = currentPos[i].y + 1
-            elif chosenMove == ACTION.DIAG_UP_RIGHT:
-                currentPos[i].y = currentPos[i].y + 1
-                currentPos[i].x = currentPos[i].x + 1
-            res[currentPos[i].x][currentPos[i].y].append(j)
-    return res
+    try:
+        # res will have areadims.x * areadims.y elements
+        res: list[list[list[int]]] = []
+        # initialize res with 0s
+        for i in range(areaDims.x):
+            res.append([])
+            for j in range(areaDims.y):
+                res[i].append([])
+        # here we will store current pos for each drone
+        currentPos: list[coordObject] = []
+        # for each drone we will initialize his current point in 0,0
+        for i in range(len(actions)):
+            currentPos.append(coordObject(0, 0))
+        # we mark the initial point of each drone as visited
+        for i in range(len(actions)):
+            res[currentPos[i].x][currentPos[i].y].append(0)
+        # for each drone
+        for i in range(len(actions)):
+            # we will iterate through the actions
+            for j in range(len(actions[i])):
+                chosenMove = actions[i][j]
+                if chosenMove == ACTION.RIGHT:
+                    currentPos[i].x = currentPos[i].x + 1
+                elif chosenMove == ACTION.DIAG_DOWN_RIGHT:
+                    currentPos[i].x = currentPos[i].x + 1
+                    currentPos[i].y = currentPos[i].y - 1
+                elif chosenMove == ACTION.DOWN:
+                    currentPos[i].y = currentPos[i].y - 1
+                elif chosenMove == ACTION.DIAG_DOWN_LEFT:
+                    currentPos[i].y = currentPos[i].y - 1
+                    currentPos[i].x = currentPos[i].x - 1
+                elif chosenMove == ACTION.LEFT:
+                    currentPos[i].x = currentPos[i].x - 1
+                elif chosenMove == ACTION.DIAG_UP_LEFT:
+                    currentPos[i].x = currentPos[i].x - 1
+                    currentPos[i].y = currentPos[i].y + 1
+                elif chosenMove == ACTION.UP:
+                    currentPos[i].y = currentPos[i].y + 1
+                elif chosenMove == ACTION.DIAG_UP_RIGHT:
+                    currentPos[i].y = currentPos[i].y + 1
+                    currentPos[i].x = currentPos[i].x + 1
+                res[currentPos[i].x][currentPos[i].y].append(j)
+        return res
+    except IndexError:
+        raise InvalidRoute
 
 
 def get_duplicates(array):
@@ -185,8 +191,21 @@ def evaluateDroneUpTime(actions: list[list[ACTION]], areaDims: coordObject) -> f
     return dronesUp/time
 
 
+# This function checks that all drones are flying inside the area
+def evaluateDronesInArea(actions: list[list[ACTION]], areaDims: coordObject) -> bool:
+    try:
+        area = populateArea(actions, areaDims)
+        return True
+    except InvalidRoute:
+        return False
+
+
+
 def evaluate(grid:list[list[ACTION]]):
     gridDimensions = DIM
+    # Lets check all drone routes are valid
+    if not evaluateDronesInArea(grid, gridDimensions):
+        return None
     # Further evaluators must be added to this dictionary
     evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage, 'Uptime': evaluateDroneUpTime}
     evaluateMetric = lambda eval: eval(grid,gridDimensions)
@@ -195,6 +214,15 @@ def evaluate(grid:list[list[ACTION]]):
     for v in results.values():
         accumulator += v
     return results
+
+def evaluateGAN(generatedList:list[list[int]]) -> dict[str,float] or None:
+    """
+    Returns:
+        Dict[str, float]: Dictionary with the results of the evaluation
+        None: If the generated list is invalid
+    """
+    parsedList = parseMoves(generatedList)
+    return evaluate(parsedList)
 
 def evaluateOutputs():
     finalGraph = {metric:[] for metric in metrics}
