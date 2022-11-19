@@ -1,10 +1,7 @@
-from sys import argv
 from constants import DIM
-from coordObject import coordObject
-from dimConverter import resizeRoute
-from routeDrawer import drawRouteAlt, interpretFile
+from routeDrawer import interpretFile
 from pathGenerator import runGreedy
-from evaluator import evaluateOutputs
+from evaluator import evaluateFile
 from POI import POI
 import argparse
 
@@ -37,7 +34,7 @@ if __name__ == "__main__":
         #     newRoutes = resizeRoute('1.txt')
         #     drawRouteAlt(DIM, POIList, coordObject(0, 0), [], newRoutes)
         elif(args.task == 'evaluate'):
-            evaluateOutputs()
+            print(evaluateFile(args.file))
         else:
             print("Invalid operation")
             print("Valid operations are ")

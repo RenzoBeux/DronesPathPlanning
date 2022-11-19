@@ -23,7 +23,7 @@ Conditional GANs can be used to supply a label during taining so the latent vect
 can be associated with a specific label - making the generation of images predictable. 
 """
 
-from keras.layers import Dense, Reshape, Flatten, Conv2D, Conv2DTranspose, LeakyReLU, Dropout
+from keras.layers import Dense, Reshape, Flatten, Conv2D, Conv2DTranspose, LeakyReLU, Dropout, Input, Concatenate
 from keras.models import load_model
 from keras.optimizers import Adam
 from keras.models import Sequential
@@ -58,8 +58,15 @@ def define_discriminator(in_shape=(6,100,1)):
 	model.add(Dense(1, activation='sigmoid')) #shape of 1
 	# compile model
 	opt = Adam(lr=0.0002, beta_1=0.5)
-	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
-	return model
+
+	modelEval = Sequential()
+	modelEval.add(Input(shape=(1,1)))
+	modelEval.add(Dense(10,activation='sigmoid'))
+	
+	result = Concatenate()
+
+	result.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
+	return result
 
 # define the standalone generator model
 # #Given input of latent vector, the Generator produces an image.(here: 32x32)
@@ -194,7 +201,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, n_epochs=100, n_batc
             ##train_on_batch allows you to update weights based on a collection 
             #of samples you provide
             #Let us just capture loss and ignore accuracy value (2nd output below)
-			d_loss_real, _ = d_model.train_on_batch(X_real, y_real) 
+			d_loss_real, _ = d_model.train_on_batch(X_real, y_real)
 			
             # generate 'fake' examples
 			X_fake, y_fake = generate_fake_samples(g_model, latent_dim, half_batch)
@@ -232,10 +239,10 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, n_epochs=100, n_batc
 latent_dim = 100
 # create the discriminator
 discriminator = define_discriminator()
-#print(discriminator.summary())
+print(discriminator.summary())
 # create the generator
 generator = define_generator(latent_dim)
-#print(generator.summary())
+print(generator.summary())
 # create the gan
 gan_model = define_gan(generator, discriminator)
 # load image data

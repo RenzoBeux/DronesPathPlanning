@@ -3,10 +3,7 @@ from coordObject import coordObject
 from POI import POI
 from constants import *
 from utils import collidesObstacle
-
-from random import randint, choices
-
-# moves always to the point
+from random import choices
 
 
 class heuristic_nefesto(moveHeuristic):
