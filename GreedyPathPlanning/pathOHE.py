@@ -60,4 +60,5 @@ def parseOheFile(fileName:str):
   routes = file.readlines()
   file.close()
   arrayRoutes = list(map(lambda route : route.replace('\n','').split(' '), routes))
-  return [[route[i:i+8] for i in range(0,len(route),8)] for route in arrayRoutes]
+  numericRoutes = list(map(lambda route: list(map(lambda move: int(move),route)),arrayRoutes))
+  return [[route[i:i+8] for i in range(0,len(route),8)] for route in numericRoutes]
