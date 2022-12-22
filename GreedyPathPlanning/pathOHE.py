@@ -43,9 +43,6 @@ def oheEncoder():
         output.write('\n')
       output.close()
 
-
-  
-
 def fromOHE(lines:list[str]):
   """
   Pass to this function the output from the readlines function on the open file
@@ -57,3 +54,10 @@ def fromOHE(lines:list[str]):
     for i in range(0,len(oheMoves),8):
       res[j].append(OHEToMove(oheMoves[i:i+8]))
   return res
+
+def parseOheFile(fileName:str):
+  file = open(fileName,'r')
+  routes = file.readlines()
+  file.close()
+  arrayRoutes = list(map(lambda route : route.replace('\n','').split(' '), routes))
+  return [[route[i:i+8] for i in range(0,len(route),8)] for route in arrayRoutes]
