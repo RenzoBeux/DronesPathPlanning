@@ -1,4 +1,5 @@
 import os
+from constants import UAVAMOUNT, ACTION
 
 def moveToOHE(move:str):
   """
@@ -10,6 +11,15 @@ def moveToOHE(move:str):
   intMove = int(move) - 1
   res[intMove] = '1'
   return res
+
+def OHEToMove(move:list[str]):
+  """
+  This function is to be called with a list of 8 characters, of which at most one is a 1
+  """
+  try:
+    return ACTION(move.index('1') + 1)
+  except:
+    return ACTION(0)
 
 def oheEncoder():
   """
@@ -34,25 +44,16 @@ def oheEncoder():
       output.close()
 
 
-def OHEToMove(move:list[str]):
-  """
-  This function is to be called with a list of 8 characters, of which at most one is a 1
-  """
-  try:
-    return move.index('1') + 1
-  except:
-    return 0
   
 
 def fromOHE(lines:list[str]):
   """
   Pass to this function the output from the readlines function on the open file
   """
-  for line in lines:
+  res:list[list[ACTION]] = [[] for i in range(UAVAMOUNT)]
+  for j,line in enumerate(lines):
     newLine = line.replace('\n','')
     oheMoves = newLine.split(' ')
     for i in range(0,len(oheMoves),8):
-      print(oheMoves[i:i+8])
-
-
-oheEncoder()
+      res[j].append(OHEToMove(oheMoves[i:i+8]))
+  return res
