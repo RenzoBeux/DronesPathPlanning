@@ -43,6 +43,16 @@ def oheEncoder():
         output.write('\n')
       output.close()
 
+def oheDecoder():
+  for dir in os.listdir('./OHEOutput'):
+    route = parseOheFile('./OHEOutput/'+dir)
+    actionRoute = list(map(lambda moves: list(map(OHEToMove,moves)),route))
+    file = open("./ohe-transformed/"+dir,"w")
+    for line in actionRoute:
+      file.write(" ".join(list(map(lambda i:str(i.value),line))) + "\n")
+    file.close()
+
+
 def fromOHE(lines:list[str]):
   """
   Pass to this function the output from the readlines function on the open file
@@ -60,5 +70,7 @@ def parseOheFile(fileName:str):
   routes = file.readlines()
   file.close()
   arrayRoutes = list(map(lambda route : route.replace('\n','').split(' '), routes))
-  numericRoutes = list(map(lambda route: list(map(lambda move: int(move),route)),arrayRoutes))
-  return [[route[i:i+8] for i in range(0,len(route),8)] for route in numericRoutes]
+  return [[route[i:i+8] for i in range(0,len(route),8)] for route in arrayRoutes]
+
+# oheEncoder()
+oheDecoder()
