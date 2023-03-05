@@ -28,7 +28,7 @@ class Constants_Class(object):
     self.device= device('cuda' if cuda.is_available() else 'cpu')
 
   BATCH_SIZE = 512
-  EPOCHS = 1
+  EPOCHS = 256
   sample_size = 3 # fixed sample size
   NOISE_DIM = 128 # latent vector size
   K = 1 # number of steps to apply to the discriminator

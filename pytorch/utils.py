@@ -11,7 +11,7 @@ def label_fake(size:int):
   return torchZeros(size,1).to(constants.device)
 
 def create_noise(size:int,nz:int):
-  return randn(size,nz)
+  return randn(size,nz).to(constants.device)
 
 def load_dataset():
   subdirs = listdir('./input')
@@ -25,7 +25,7 @@ def load_dataset():
       file_routes = list(map(lambda x : list(map(float, x.split(' '))),file_lines))
       all_file_routes.append(file_routes)
   files_tensor_routes = (tensor(all_file_routes,dtype=float32) / 4 - 1).to(constants.device)
-  _labels = torchZeros(len(files_tensor_routes))
+  _labels = torchZeros(len(files_tensor_routes)).to(constants.device)
   files_dataset = TensorDataset(files_tensor_routes,_labels)
   route_loader = DataLoader(files_dataset,batch_size=constants.BATCH_SIZE,shuffle=True)
   tensor_shape = files_tensor_routes.shape

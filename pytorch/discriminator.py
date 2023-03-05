@@ -1,4 +1,4 @@
-from torch import Tensor
+from torch import Tensor, randn
 from torch.nn import Module, Linear, Sequential, LeakyReLU, Dropout, Sigmoid
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
@@ -25,6 +25,7 @@ class Discriminator(Module):
     )
 
   def forward(self, x):
+    x= x + randn(x.size()).to(constants.device) * 0.1
     x = x.view(-1, self.n_input)
     return self.main(x)
 
