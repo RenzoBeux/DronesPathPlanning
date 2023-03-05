@@ -1,8 +1,6 @@
 from os import listdir
 from torch import device,cuda, tensor
 
-
-
 class Constants_Class(object):
   def __new__(cls):
     if not hasattr(cls, 'instance'):
@@ -12,6 +10,17 @@ class Constants_Class(object):
   def __init__(self):
     self.set_uav_amount_and_time()
     self.set_device()
+
+  BATCH_SIZE = 512
+  EPOCHS = 1
+  sample_size = 3 # fixed sample size
+  NOISE_DIM = 128 # latent vector size
+  K = 1 # number of steps to apply to the discriminator
+  device
+  uav_amount:int = None
+  time_lenght:int = None
+  g_learn_rate:float = 0.0002
+  d_learn_rate:float = 0.00002
 
   def set_uav_amount_and_time(self):
     input_files = listdir('./input')
@@ -27,15 +36,6 @@ class Constants_Class(object):
   def set_device(self):
     self.device= device('cuda' if cuda.is_available() else 'cpu')
 
-  BATCH_SIZE = 512
-  EPOCHS = 256
-  sample_size = 3 # fixed sample size
-  NOISE_DIM = 128 # latent vector size
-  K = 1 # number of steps to apply to the discriminator
-  device
-  uav_amount:int = None
-  time_lenght:int = None
-   
 constants = Constants_Class()
 
 
