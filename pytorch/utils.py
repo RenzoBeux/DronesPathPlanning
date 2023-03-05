@@ -24,7 +24,7 @@ def load_dataset():
       file.close()
       file_routes = list(map(lambda x : list(map(float, x.split(' '))),file_lines))
       all_file_routes.append(file_routes)
-  files_tensor_routes = tensor(all_file_routes,dtype=float32) / 4 - 1
+  files_tensor_routes = (tensor(all_file_routes,dtype=float32) / 4 - 1).to(constants.device)
   _labels = torchZeros(len(files_tensor_routes))
   files_dataset = TensorDataset(files_tensor_routes,_labels)
   route_loader = DataLoader(files_dataset,batch_size=constants.BATCH_SIZE,shuffle=True)
