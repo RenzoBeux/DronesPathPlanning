@@ -1,22 +1,14 @@
-from math import ceil
 import os
+from constants import ORIGIN
 from Obstacle import Obstacle
-from constants import ACTION, BATTERY_CAPACITY, DIM, OBSTACLES, POIS, POIS_TIMES, UAVAMOUNT, TIMELENGTH, BIGDIM
-from random import randint, random, seed, shuffle
+from constants import DIM, OBSTACLES, POIS, POIS_TIMES, UAVAMOUNT, TIMELENGTH
+from random import random, seed, shuffle
 from coordObject import coordObject
 from POI import POI
 from UAV import UAV
-from heuristics.ImoveHeuristic import moveHeuristic
+from heuristics.ardemisa import heuristic_ardemisa
 from heuristics.nefesto import heuristic_nefesto
-from heuristics.ades import heuristic_ades
 from utils import *
-
-
-def generatePOICoord():
-    x = random
-    y = random
-    return coordObject(x, y)
-
 
 # this function saves into a txt file an array of arrays of strings
 def saveMap(map, id, successProbability):
@@ -36,21 +28,20 @@ def saveMap(map, id, successProbability):
 def runGreedy(id, successProbability):
     seed(id)
     dims = DIM
-    POIPosition = list(POIS)
+    POIPosition = POIS
     POITimes = POIS_TIMES
     POIList: list[POI] = []
     UAVList: list[UAV] = []
     needyPOI: list[POI] = []
     obstacles: list[Obstacle] = OBSTACLES
-    # print(successProbability)
     # POI and UAV creation
     for i in range(len(POIPosition)):
         currPOI = POI(POIPosition[i], POITimes[i], i)
         POIList.append(currPOI)
         needyPOI.append(currPOI)
     for i in range(UAVAMOUNT):
-        currUAV = UAV(dims, coordObject(0, 0), obstacles,
-                      heuristic_nefesto(successProbability), i)
+        # currUAV = UAV(dims, ORIGIN.copy(), obstacles,heuristic_nefesto(successProbability), i)
+        currUAV = UAV(dims, ORIGIN.copy(), obstacles,heuristic_ardemisa(), i)
         UAVList.append(currUAV)
 
     # add randomness to UAV picking POIs
@@ -67,8 +58,6 @@ def runGreedy(id, successProbability):
     for t in range(TIMELENGTH):
         # increase turnOnProbability exponentially
         turnOnProbability = turnOnProbability * 1.1
-        # print('TIME:', t)
-        # print(UAVList[0].position.x, ' ', UAVList[0].position.y)
         for poi in POIList:
             flag = True
             for uav in UAVList:
@@ -82,12 +71,10 @@ def runGreedy(id, successProbability):
                 uav.setIsOn(True)
             needyPOI = uav.move([t, dims, needyPOI])
 
-        # printMapGrid(UAVList, list(
-        #     map(lambda poi: poi.getSection(dims), POIList)), flatten_obstacles(dims))
-
     # i want the table to be sorted at the end
     UAVList.sort(key=lambda x: x.id)
     res = []
+
     for uav in UAVList:
         res.append(list(map(lambda move: str(move.value), uav.moves)))
     saveMap(res, id, successProbability)
