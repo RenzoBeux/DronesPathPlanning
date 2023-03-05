@@ -14,14 +14,16 @@ def create_noise(size:int,nz:int):
   return randn(size,nz)
 
 def load_dataset():
-  input_files = listdir('./input')
+  subdirs = listdir('./input')
   all_file_routes:list[int] = []
-  for i in input_files:
-    file = open(f"./input/{i}",'r')
-    file_lines = file.readlines()
-    file.close()
-    file_routes = list(map(lambda x : list(map(float, x.split(' '))),file_lines))
-    all_file_routes.append(file_routes)
+  for i in subdirs:
+    files = listdir(f"./input/{i}")
+    for j in files:
+      file = open(f"./input/{i}/{j}",'r')
+      file_lines = file.readlines()
+      file.close()
+      file_routes = list(map(lambda x : list(map(float, x.split(' '))),file_lines))
+      all_file_routes.append(file_routes)
   files_tensor_routes = tensor(all_file_routes,dtype=float32) / 4 - 1
   _labels = torchZeros(len(files_tensor_routes))
   files_dataset = TensorDataset(files_tensor_routes,_labels)

@@ -15,7 +15,8 @@ class Constants_Class(object):
 
   def set_uav_amount_and_time(self):
     input_files = listdir('./input')
-    file = open(f"./input/{input_files[0]}",'r')
+    single_file = listdir(f"./input/{input_files[0]}")
+    file = open(f"./input/{input_files[0]}/{single_file[0]}",'r')
     file_lines = file.readlines()
     file.close()
     file_routes = list(map(lambda x : [list(map(int, x.split(' ')))],file_lines))
