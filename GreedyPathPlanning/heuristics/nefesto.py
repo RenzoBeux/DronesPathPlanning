@@ -14,7 +14,7 @@ class heuristic_nefesto(moveHeuristic):
     def __init__(self, succProb):
         self.succProb = succProb
 
-    def getMove(self, parameters) -> ACTION:
+    def getMove(self, parameters) -> tuple[ACTION, list[POI]]:
         # Parse parameters
         time = parameters[0]
         dim = parameters[1]
@@ -50,9 +50,6 @@ class heuristic_nefesto(moveHeuristic):
 
             chosenMove = choices(possibleMoves, [probForMovePunished if collidesObstacle(
                 mov, position, dim) else probForMove for mov in possibleMoves], k=1)[0]
-
-            # randomNumber = randint(0, len(possibleMoves)-1)
-            # chosenMove = possibleMoves[randomNumber]
         return chosenMove, needyPOI
 
     def setTarget(self, target: POI):

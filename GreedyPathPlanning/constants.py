@@ -9,8 +9,8 @@ from Obstacle import Obstacle
 DIM = coordObject(8, 3)
 BIGDIM = coordObject(32, 12)
 ORIGIN = coordObject(0, 0)
-UAVAMOUNT = 6
-TIMELENGTH = 100
+UAVAMOUNT = 3
+TIMELENGTH = 200
 POIS = [coordObject(0.031, 0.909), coordObject(0.56, 0.09),
         coordObject(0.937, 0.09), coordObject(0.937, 0.909)]
 POIS_TIMES = [10, 18, 18, 18]
@@ -46,3 +46,13 @@ markers = ['o', '^', 'v', '<', '>', 's',
            'p', '*', 'h', 'H', 'D', 'd', 'P', 'X']
 
 metrics = ['Coverage', 'Collision', 'Obstacles', 'POIS', 'Uptime']
+allMoves = [ACTION.STAY,
+            ACTION.RIGHT,
+            ACTION.DIAG_DOWN_RIGHT,
+            ACTION.DOWN,
+            ACTION.DIAG_DOWN_LEFT,
+            ACTION.LEFT,
+            ACTION.DIAG_UP_LEFT,
+            ACTION.UP,
+            ACTION.DIAG_UP_RIGHT
+            ]

@@ -102,3 +102,17 @@ def getListOfPois()->list[POI]:
     Returns a list of POI objects, for all of the POIs in the scenario
     """
     return [POI(coord,POIS_TIMES[i],i) for i, coord in enumerate(POIS)]
+
+def getMoveFromTo(orig: coordObject, destiny: coordObject) -> list[ACTION]:
+  xDelta = int(destiny.x-orig.x)
+  yDelta = int(destiny.y-orig.y)
+  if xDelta == 0 and yDelta == 0:
+    return [ACTION.STAY]
+  results:list[ACTION] = [deltaToACTION(xDelta,yDelta)]
+  if yDelta != 0:
+    results.append(deltaToACTION(xDelta,0))
+  if xDelta != 0:
+    results.append(deltaToACTION(0,yDelta))
+  return results
+  
+  

@@ -1,9 +1,9 @@
+import argparse
+import traceback
 from constants import DIM
 from routeDrawer import interpretFile
 from pathGenerator import runGreedy
 from evaluator import evaluateFile
-from POI import POI
-import argparse
 
 parser = argparse.ArgumentParser()
 
@@ -18,26 +18,16 @@ if __name__ == "__main__":
         # Create dataset
         if (args.task == 'create'):
             # runGreedy(1,90/100)
-            for k in range(70, 100):
-                for i in range(1, 10):
-                    runGreedy(i, k/100)
+            # for k in range(70, 100):
+                for i in range(1, 100):
+                    runGreedy(i, 1/100)
         # Print UAVs flight
         elif (args.task == 'print'):
             interpretFile(args.file, dimensions=DIM)
-        # elif (int(argv[1]) == 2):
-        #     POIPosition = list([coordObject(0.3, 0.3), coordObject(0.8, 0.8)])
-        #     POITimes = [2, 5]
-        #     POIList: list[POI] = []
-        #     for i in range(len(POIPosition)):
-        #         currPOI = POI(POIPosition[i], POITimes[i], i)
-        #         POIList.append(currPOI)
-        #     newRoutes = resizeRoute('1.txt')
-        #     drawRouteAlt(DIM, POIList, coordObject(0, 0), [], newRoutes)
         elif(args.task == 'evaluate'):
             print(evaluateFile(args.file))
         else:
             print("Invalid operation")
             print("Valid operations are ")
-    except IndexError as err:
-        print(
-            err.with_traceback(err))
+    except:
+        traceback.print_exc()

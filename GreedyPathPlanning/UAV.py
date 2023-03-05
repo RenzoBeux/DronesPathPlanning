@@ -73,7 +73,7 @@ class UAV:
     #             self.battery = BATTERY_CAPACITY
     #     return self.moves.append(ACTION.STAY)
 
-    def move(self, parameters: list[any]):
+    def move(self, parameters: list):
         """
         Either moves according to its heuristic, or it moves towards its charging port
         """
@@ -167,7 +167,7 @@ class UAV:
         """
         counter = 0
         auxUAV = UAV(self.dims, coordObject(self.position.x,
-                     self.position.y), self.obstaclesRaw, None, -1)
+                     self.position.y), self.obstaclesRaw, moveHeuristic(), -1)
         while (auxUAV.position.x != ORIGIN.x or auxUAV.position.y != ORIGIN.y):
             auxUAV.shiftPosition(auxUAV.moveToCharge())
             counter += 1
