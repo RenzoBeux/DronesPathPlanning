@@ -50,7 +50,7 @@ for epoch in range(constants.EPOCHS):
     if i % 20 == 0:
       generated_img = generator(noise).cpu().detach()
       move_tensor = output_to_moves(generated_img)
-      tensor_to_file(move_tensor,'output/test')
+      tensor_to_file(move_tensor,f'output/test.{i}')
 
     epoch_g_loss = g_loss / i
     epoch_d_loss = d_loss / i
