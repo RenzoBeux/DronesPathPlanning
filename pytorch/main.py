@@ -61,6 +61,9 @@ for epoch in range(constants.EPOCHS):
       makedirs('output')
     generated_img = generator(noise).cpu().detach()
     move_tensor = output_to_moves(generated_img)
-    tensor_to_file(move_tensor,f'output/test.{i}')
+    tensor_to_file(move_tensor,f'output/test.{epoch}')
 
   print(f"Epoch:{epoch} time:{end-start} g_loss:{epoch_g_loss} d_loss:{epoch_d_loss}")
+  generated_img = generator(noise).cpu().detach()
+  move_tensor = output_to_moves(generated_img)
+  tensor_to_file(move_tensor,f'output/test.{epoch}')

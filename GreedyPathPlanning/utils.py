@@ -12,6 +12,9 @@ def readFileAction(fileName:str)-> list[list[ACTION]]:
     result = []
     for line in lines:
         line = line.replace('\n', '')
+        # if it has a last space char then delete it
+        if line[-1] == ' ':
+            line = line[:-1]
         result.append(list(map(lambda x: ACTION(int(x)), line.split(' '))))
     return result
 
