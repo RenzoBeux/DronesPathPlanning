@@ -14,7 +14,16 @@ def graph_output(file_name:str):
       vals.append(values[i])
       graph[key] = vals
   for key,val in graph.items():
+    if key == "Epoch":
+      continue
     plt.plot(val,label=key)
   plt.legend()
   plt.show()
-graph_output('input.txt')
+
+
+import argparse
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-i", "--input", help="File to interpret", dest="input", type=str)
+  args = parser.parse_args()
+  graph_output(args.input)
