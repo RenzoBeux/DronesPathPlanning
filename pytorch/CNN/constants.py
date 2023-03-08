@@ -11,8 +11,8 @@ class Constants_Class(object):
     self.set_uav_amount_and_time()
     self.set_device()
 
-  BATCH_SIZE = 512
-  EPOCHS = 1
+  BATCH_SIZE = 32
+  EPOCHS = 256
   sample_size = 3 # fixed sample size
   NOISE_DIM = 128 # latent vector size
   K = 1 # number of steps to apply to the discriminator
@@ -20,7 +20,7 @@ class Constants_Class(object):
   uav_amount:int = None
   time_lenght:int = None
   g_learn_rate:float = 0.0002
-  d_learn_rate:float = 0.00002
+  d_learn_rate:float = 0.000005
 
   def set_uav_amount_and_time(self):
     input_files = listdir('./input')

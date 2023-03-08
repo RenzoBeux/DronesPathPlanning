@@ -1,5 +1,5 @@
 from torch import Tensor, randn
-from torch.nn import Module, Linear, Sequential, LeakyReLU, Dropout, Sigmoid
+from torch.nn import Module, Linear, Sequential, LeakyReLU, Dropout, Sigmoid, BCELoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
 
@@ -13,13 +13,13 @@ class Discriminator(Module):
     self.main = Sequential(
       Linear(self.n_input, 1024),
       LeakyReLU(0.2),
-      Dropout(0.3),
+      Dropout(0.4),
       Linear(1024, 512),
       LeakyReLU(0.2),
-      Dropout(0.3),
+      Dropout(0.4),
       Linear(512, 256),
       LeakyReLU(0.2),
-      Dropout(0.3),
+      Dropout(0.4),
       Linear(256, 1),
       Sigmoid(),
     )
@@ -28,6 +28,12 @@ class Discriminator(Module):
     x= x + randn(x.size()).to(constants.device) * 0.1
     x = x.view(-1, self.n_input)
     return self.main(x)
+  
+def binary_cross_entropy_with_label_smoothing(input, target, smoothing=0.2):
+  target = target * (1 - smoothing) + 0.5 * smoothing
+  loss = BCELoss()(input, target)
+  return loss
+
 
 def train_discriminator(discriminator:Discriminator,loss_fun:_Loss, d_optimizer:Optimizer, 
                         data_real:Tensor, data_fake:Tensor):
@@ -36,9 +42,9 @@ def train_discriminator(discriminator:Discriminator,loss_fun:_Loss, d_optimizer:
   fake_label = label_fake(curr_batch_size)
   d_optimizer.zero_grad()
   output_real = discriminator(data_real)
-  loss_real = loss_fun(output_real, real_label)
+  loss_real = binary_cross_entropy_with_label_smoothing(output_real, real_label)
   output_fake = discriminator(data_fake)
-  loss_fake = loss_fun(output_fake, fake_label)
+  loss_fake = binary_cross_entropy_with_label_smoothing(output_fake, fake_label)
   loss_real.backward()
   loss_fake.backward()
   d_optimizer.step()
