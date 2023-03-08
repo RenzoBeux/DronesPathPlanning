@@ -45,7 +45,6 @@ for epoch in range(constants.EPOCHS):
     for step in range(constants.K): # Optional if we always consider k as 1
       data_fake = generator(create_noise(curr_batch_size,constants.NOISE_DIM))
       data_real = images
-      tensors_data_fake = output_to_moves(data_fake)
       d_loss += train_discriminator(discriminator,d_loss_fun,d_optim,data_real,tensors_data_fake)
 
     data_fake = generator(create_noise(curr_batch_size,constants.NOISE_DIM))
