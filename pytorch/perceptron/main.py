@@ -10,7 +10,6 @@ from generator import Generator, train_generator
 from utils import create_noise,load_dataset,output_to_moves,tensor_to_file
 
 print(f"Working on {constants.device}")
-
 route_loader,tensor_shape = load_dataset()
 
 print(f"dataset_size {tensor_shape[0]}")
@@ -46,7 +45,8 @@ for epoch in range(constants.EPOCHS):
     for step in range(constants.K): # Optional if we always consider k as 1
       data_fake = generator(create_noise(curr_batch_size,constants.NOISE_DIM))
       data_real = images
-      d_loss += train_discriminator(discriminator,d_loss_fun,d_optim,data_real,data_fake)
+      tensors_data_fake = output_to_moves(data_fake)
+      d_loss += train_discriminator(discriminator,d_loss_fun,d_optim,data_real,tensors_data_fake)
 
     data_fake = generator(create_noise(curr_batch_size,constants.NOISE_DIM))
     g_loss += train_generator(discriminator,g_loss_fun,g_optim,data_fake)
@@ -64,6 +64,6 @@ for epoch in range(constants.EPOCHS):
     tensor_to_file(move_tensor,f'output/test.{epoch}')
 
   print(f"Epoch: {epoch} time: {end-start} g_loss: {epoch_g_loss} d_loss: {epoch_d_loss}")
-  generated_img = generator(noise).cpu().detach()
-  move_tensor = output_to_moves(generated_img)
-  tensor_to_file(move_tensor,f'output/test.{epoch}')
+generated_img = generator(noise).cpu().detach()
+move_tensor = output_to_moves(generated_img)
+tensor_to_file(move_tensor,f'output/test.{constants.EPOCHS}')

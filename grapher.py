@@ -14,7 +14,7 @@ def graph_output(file_name:str):
       vals.append(values[i])
       graph[key] = vals
   for key,val in graph.items():
-    if key == "Epoch":
+    if key == "Epoch" or key == "time":
       continue
     plt.plot(val,label=key)
   plt.legend()

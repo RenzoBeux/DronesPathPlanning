@@ -15,7 +15,7 @@ def create_noise(size:int,nz:int):
 
 def load_dataset():
   subdirs = listdir('./input')
-  all_file_routes:list[int] = []
+  all_file_routes:list[list[list[float]]] = []
   for i in subdirs:
     files = listdir(f"./input/{i}")
     for j in files:
@@ -35,7 +35,7 @@ def output_to_moves(route:Tensor):
   return ((route + 1) * 4).round()
 
 def tensor_to_file(tensor_routes:Tensor,file_name:str):
-  route_samples:list[list[float]] = tensor_routes.tolist()
+  route_samples:list[list[list[float]]] = tensor_routes.tolist()
   for (i,sample) in enumerate(route_samples):
     file = open(f"{file_name}.{i}.txt",'w')
     for route in sample:
