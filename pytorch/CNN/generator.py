@@ -1,4 +1,4 @@
-from torch.nn import Module, Linear, Sequential, Tanh, LeakyReLU
+from torch.nn import Module, Linear, Sequential, Tanh, LeakyReLU .
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
 from constants import constants
@@ -11,14 +11,14 @@ class Generator(Module):
     super(Generator, self).__init__()
     self.noise_dim = noise_dim
     self.main = Sequential(
-      Linear(self.noise_dim,256),
-      LeakyReLU(0.2),
-      Linear(256,512),
-      LeakyReLU(0.2),
-      Linear(512,1024),
-      LeakyReLU(0.2),
-      Linear(1024,constants.uav_amount * constants.time_lenght),
-      Tanh(),
+           Linear(latent_size, 64 * (output_size // 8)),
+           ReLU(),
+           ConvTranspose1d(64, 32, kernel_size=5, stride=2, padding=2),
+           ReLU(),
+           ConvTranspose1d(32, 16, kernel_size=5, stride=2, padding=2),
+           ReLU(),
+           ConvTranspose1d(16, 1, kernel_size=5, stride=2, padding=2),
+           Tanh()
     )
 
   def forward(self, x):

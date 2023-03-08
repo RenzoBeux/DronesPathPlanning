@@ -1,5 +1,5 @@
 from torch import Tensor, randn
-from torch.nn import Module, Linear, Sequential, LeakyReLU, Dropout, Sigmoid, BCELoss
+from torch.nn import Module, Linear, Sequential, LeakyReLU, Dropout, Sigmoid, BCELoss, Conv1d, Flatten
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
 
@@ -11,25 +11,35 @@ class Discriminator(Module):
     super(Discriminator, self).__init__()
     self.n_input = constants.uav_amount * constants.time_lenght
     self.main = Sequential(
-      Linear(self.n_input, 1024),
-      LeakyReLU(0.2),
-      Dropout(0.4),
-      Linear(1024, 512),
-      LeakyReLU(0.2),
-      Dropout(0.4),
-      Linear(512, 256),
-      LeakyReLU(0.2),
-      Dropout(0.4),
-      Linear(256, 1),
-      Sigmoid(),
+           Conv1d(1, 16, kernel_size=5, stride=2, padding=2),
+           LeakyReLU(0.2),
+           Dropout(0.4),
+           Conv1d(16, 32, kernel_size=5, stride=2, padding=2),
+           LeakyReLU(0.2),
+           Dropout(0.4),
+           Conv1d(32, 64, kernel_size=5, stride=2, padding=2),
+           LeakyReLU(0.2),
+           Dropout(0.4),
+           Flatten(),
+           Linear(64 * ( self.n_input // 8), 1024),
+           LeakyReLU(0.2),
+           Dropout(0.4),
+           Linear(1024, 512),
+           LeakyReLU(0.2),
+           Dropout(0.4),
+           Linear(512, 256),
+           LeakyReLU(0.2),
+           Dropout(0.4),
+           Linear(256, 1),
+           Sigmoid()
     )
 
   def forward(self, x):
-    x= x + randn(x.size()).to(constants.device) * 0.1
-    x = x.view(-1, self.n_input)
-    return self.main(x)
+   x = x + randn(x.size()).to(x.device) * 0.1
+   x = x.view(-1, 1, self.n_input)
+   return self.main(x)
   
-def binary_cross_entropy_with_label_smoothing(input, target, smoothing=0.2):
+def binary_cross_entropy_with_label_smoothing(input, target, smoothing=0.1):
   target = target * (1 - smoothing) + 0.5 * smoothing
   loss = BCELoss()(input, target)
   return loss
