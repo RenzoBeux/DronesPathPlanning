@@ -11,6 +11,8 @@ from heuristics.nefesto import heuristic_nefesto
 from utils import *
 
 # this function saves into a txt file an array of arrays of strings
+
+
 def saveMap(map, id, successProbability):
     # create a folder inside output/
     if not os.path.exists('output/'):
@@ -28,7 +30,7 @@ def saveMap(map, id, successProbability):
 def runGreedy(id, successProbability):
     seed(id)
     dims = DIM
-    POIPosition = POIS
+    POIPosition = list(POIS)
     POITimes = POIS_TIMES
     POIList: list[POI] = []
     UAVList: list[UAV] = []
@@ -40,8 +42,9 @@ def runGreedy(id, successProbability):
         POIList.append(currPOI)
         needyPOI.append(currPOI)
     for i in range(UAVAMOUNT):
-        # currUAV = UAV(dims, ORIGIN.copy(), obstacles,heuristic_nefesto(successProbability), i)
-        currUAV = UAV(dims, ORIGIN.copy(), obstacles,heuristic_ardemisa(), i)
+        currUAV = UAV(dims, ORIGIN.copy(), obstacles,
+                      heuristic_nefesto(successProbability), i)
+        # currUAV = UAV(dims, ORIGIN.copy(), obstacles,heuristic_ardemisa(), i)
         UAVList.append(currUAV)
 
     # add randomness to UAV picking POIs
