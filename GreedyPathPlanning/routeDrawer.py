@@ -86,7 +86,6 @@ def drawRouteAlt(dimensions: coordObject, Pois: list[POI], origin: coordObject, 
     ticks = [t for t in range(dimensions.x)]
     plt.xticks(ticks=ticks)
     plt.yticks(ticks=ticks)
-    print(flatten_obstacles(dimensions))
     for badSection in flatten_obstacles(dimensions):
         plt.fill([badSection.x, badSection.x+1, badSection.x+1, badSection.x],
                  [badSection.y, badSection.y, badSection.y+1, badSection.y+1],

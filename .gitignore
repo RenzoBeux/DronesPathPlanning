@@ -2,3 +2,6 @@ GreedyPathPlanning/heuristics/__pycache__/
 GreedyPathPlanning/output/
 output/
 __pycache__/
+*/**/*output/
+*/**/*input/
+__pycache__/

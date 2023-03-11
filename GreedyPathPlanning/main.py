@@ -1,10 +1,8 @@
-from sys import argv
 from constants import DIM
 from routeDrawer import interpretFile
 from pathGenerator import runGreedy
-from evaluator import evaluateOutputs
-from CGAN.GAN import parseInputs
-
+from evaluator import evaluateFile
+from POI import POI
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -27,9 +25,7 @@ if __name__ == "__main__":
         elif (args.task == 'print'):
             interpretFile(args.file, dimensions=DIM)
         elif(args.task == 'evaluate'):
-            evaluateOutputs()
-        elif(args.task == 'GAN'):
-            parseInputs()
+            print(evaluateFile(args.file))
         else:
             print("Invalid operation")
             print("Valid operations are ")
