@@ -25,18 +25,18 @@ def oheEncoder():
   """
   Creates another output directory with the paths listed in one hot encoding manner
   """
-  for dir in os.listdir('./output'):
-    for fileName in os.listdir('./output/'+dir):
-      file = open('./output/'+dir+'/'+fileName,'r')
+  for dir in os.listdir('./routesInput'):
+    for fileName in os.listdir('./routesInput/'+dir):
+      file = open('./routesInput/'+dir+'/'+fileName,'r')
       routes = file.readlines()
       file.close()
       movesInMoves:list[list[str]] = list(map(lambda x: x.split(' '),routes))
       movesInOHE:list[list[list[str]]] = list(map(lambda x: list(map(lambda y:moveToOHE(y),x)),movesInMoves))
-      if not os.path.exists('OHEOutput'):
-        os.makedirs('OHEOutput')
-      if not os.path.exists('OHEOutput/'+dir):
-        os.makedirs('OHEOutput/'+dir)
-      output = open('./OHEOutput/'+dir+'/'+fileName,"a")
+      if not os.path.exists('OHEinput'):
+        os.makedirs('OHEinput')
+      if not os.path.exists('OHEinput/'+dir):
+        os.makedirs('OHEinput/'+dir)
+      output = open('./OHEinput/'+dir+'/'+fileName,"a")
       for uavRoute in movesInOHE:
         route = str.join(' ',list(map(lambda move:str.join(' ',move),uavRoute)))
         output.write(route)
@@ -44,10 +44,10 @@ def oheEncoder():
       output.close()
 
 def oheDecoder():
-  for dir in os.listdir('./OHEOutput'):
-    route = parseOheFile('./OHEOutput/'+dir)
+  for dir in os.listdir('./OHEinput'):
+    route = parseOheFile('./OHEinput/'+dir)
     actionRoute = list(map(lambda moves: list(map(OHEToMove,moves)),route))
-    file = open("./ohe-transformed/"+dir,"w")
+    file = open("./ohe-transformed-output/"+dir,"w")
     for line in actionRoute:
       file.write(" ".join(list(map(lambda i:str(i.value),line))) + "\n")
     file.close()
@@ -73,4 +73,4 @@ def parseOheFile(fileName:str):
   return [[route[i:i+8] for i in range(0,len(route),8)] for route in arrayRoutes]
 
 # oheEncoder()
-oheDecoder()
+# oheDecoder()
