@@ -5,6 +5,7 @@ from torch.nn import BCELoss
 from torch.optim import Adam
 
 from constants import constants
+from evaluator import evaluateGAN
 from discriminator import Discriminator, train_discriminator
 from generator import Generator, train_generator
 from utils import create_noise,load_dataset,output_to_moves,tensor_to_file
@@ -48,6 +49,9 @@ for epoch in range(constants.EPOCHS):
       d_loss += train_discriminator(discriminator,d_loss_fun,d_optim,data_real,data_fake)
 
     data_fake = generator(create_noise(curr_batch_size,constants.NOISE_DIM))
+    move_list = output_to_moves(data_fake).tolist()
+    list(map(evaluateGAN,move_list))
+    
     g_loss += train_generator(discriminator,g_loss_fun,g_optim,data_fake)
 
     epoch_g_loss = g_loss / i

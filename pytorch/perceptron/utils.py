@@ -31,7 +31,7 @@ def load_dataset():
   tensor_shape = files_tensor_routes.shape
   return route_loader, tensor_shape
 
-def output_to_moves(route:Tensor):
+def output_to_moves(route:Tensor) -> Tensor:
   return ((route + 1) * 4).round()
 
 def tensor_to_file(tensor_routes:Tensor,file_name:str):
