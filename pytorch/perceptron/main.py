@@ -1,6 +1,7 @@
 from os import makedirs
 from os.path import isdir
 from time import time
+from torch import FloatTensor
 from torch.nn import BCELoss
 from torch.optim import Adam
 
@@ -24,6 +25,7 @@ discriminator = Discriminator().to(constants.device)
 # Define the loss function and optimizer for the discriminator
 d_loss_fun = BCELoss()
 g_loss_fun = BCELoss()
+eval_loss_fun = BCELoss()
 g_optim = Adam(generator.parameters(), lr=constants.g_learn_rate)
 d_optim = Adam(discriminator.parameters(), lr=constants.d_learn_rate)
 
@@ -31,6 +33,7 @@ noise = create_noise(constants.sample_size,constants.NOISE_DIM)
 
 g_losses:list[float] = []
 d_losses:list[float] = []
+evals:list[float] = []
 images = []
 # Define the training loop
 for epoch in range(constants.EPOCHS):
@@ -49,9 +52,11 @@ for epoch in range(constants.EPOCHS):
       d_loss += train_discriminator(discriminator,d_loss_fun,d_optim,data_real,data_fake)
 
     data_fake = generator(create_noise(curr_batch_size,constants.NOISE_DIM))
+
     move_list = output_to_moves(data_fake).tolist()
-    list(map(evaluateGAN,move_list))
-    
+    evaluations = list(map(evaluateGAN,move_list))
+    FloatTensor(evaluations).mean()
+
     g_loss += train_generator(discriminator,g_loss_fun,g_optim,data_fake)
 
     epoch_g_loss = g_loss / i
