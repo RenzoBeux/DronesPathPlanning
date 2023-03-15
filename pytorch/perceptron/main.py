@@ -6,7 +6,7 @@ from torch.nn import BCELoss
 from torch.optim import Adam
 
 from constants import constants
-from evaluator import evaluateGAN
+from evaluator import evaluateGAN, evaluator_loss
 from discriminator import Discriminator, train_discriminator
 from generator import Generator, train_generator
 from utils import create_noise,load_dataset,output_to_moves,tensor_to_file
@@ -25,7 +25,7 @@ discriminator = Discriminator().to(constants.device)
 # Define the loss function and optimizer for the discriminator
 d_loss_fun = BCELoss()
 g_loss_fun = BCELoss()
-eval_loss_fun = BCELoss()
+e_loss_fun = BCELoss()
 g_optim = Adam(generator.parameters(), lr=constants.g_learn_rate)
 d_optim = Adam(discriminator.parameters(), lr=constants.d_learn_rate)
 
@@ -34,6 +34,7 @@ noise = create_noise(constants.sample_size,constants.NOISE_DIM)
 g_losses:list[float] = []
 d_losses:list[float] = []
 evals:list[float] = []
+e_losses:list[float] = []
 images = []
 # Define the training loop
 for epoch in range(constants.EPOCHS):
@@ -55,7 +56,11 @@ for epoch in range(constants.EPOCHS):
 
     move_list = output_to_moves(data_fake).tolist()
     evaluations = list(map(evaluateGAN,move_list))
-    FloatTensor(evaluations).mean()
+    eval_tensor = FloatTensor(evaluations)
+    e_loss = evaluator_loss(eval_tensor,e_loss_fun,curr_batch_size)
+    e_losses.append(e_loss)
+    eval_avg = eval_tensor.mean()
+    evals.append(eval_avg)
 
     g_loss += train_generator(discriminator,g_loss_fun,g_optim,data_fake)
 
@@ -71,7 +76,7 @@ for epoch in range(constants.EPOCHS):
     move_tensor = output_to_moves(generated_img)
     tensor_to_file(move_tensor,f'output/test.{epoch}')
 
-  print(f"Epoch: {epoch} time: {end-start} g_loss: {epoch_g_loss} d_loss: {epoch_d_loss}")
+  print(f"Epoch: {epoch} time: {end-start} eval: {eval_avg} e_loss: {eval_avg} g_loss: {epoch_g_loss} d_loss: {epoch_d_loss}")
 generated_img = generator(noise).cpu().detach()
 move_tensor = output_to_moves(generated_img)
 tensor_to_file(move_tensor,f'output/test.{constants.EPOCHS}')

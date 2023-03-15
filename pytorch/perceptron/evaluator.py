@@ -166,6 +166,8 @@ def evaluateGAN(generatedList:list[list[int]]):
   parsedList = parseMoves(generatedList)
   return evaluate(parsedList)
 
-def evaluator_loss(evals:FloatTensor,loss_fun):
-  real = label_real(evals.size)
-  return loss_fun(evals,real)
+def evaluator_loss(evals:FloatTensor,loss_fun,curr_batch_size:int):
+  real = label_real(curr_batch_size)
+  new_real = real.reshape(curr_batch_size)
+  res = loss_fun(evals,new_real)
+  return res
