@@ -84,8 +84,7 @@ def get_duplicates(array):
 ################################################################################################################################################
 
 # This function evaluates the coverage of the area
-def evaluateCoverageArea(actions: list[list[ACTION]], areaDims: coordObject) -> float:
-    area,_ = populateArea(actions, areaDims)
+def evaluateCoverageArea(actions: list[list[ACTION]], areaDims: coordObject,area: list[list[list[int]]]) -> float:
     numberOfSquares = areaDims.x * areaDims.y
     res = numberOfSquares
     for i in range(areaDims.x):
@@ -95,8 +94,7 @@ def evaluateCoverageArea(actions: list[list[ACTION]], areaDims: coordObject) -> 
     return res / numberOfSquares
 
 # This function will reward if drones don't share the same square at the same time
-def evaluateDronesCollision(actions: list[list[ACTION]], areaDims: coordObject) -> float:
-    area,_ = populateArea(actions, areaDims)
+def evaluateDronesCollision(actions: list[list[ACTION]], areaDims: coordObject,area: list[list[list[int]]]) -> float:
     numberOfDrones = len(actions)
     numberOfTimes = len(actions[0])
     worstCase = numberOfDrones * numberOfTimes  # all time moves together
@@ -114,11 +112,9 @@ def evaluateDronesCollision(actions: list[list[ACTION]], areaDims: coordObject) 
     return 1 - (res / worstCase)
 
 # This function will reward drones for not flying over obstacles
-def evaluateObstacles(actions: list[list[ACTION]], areaDims: coordObject) -> float:
-    area,_ = populateArea(actions, areaDims)
+def evaluateObstacles(actions: list[list[ACTION]], areaDims: coordObject,area: list[list[list[int]]]) -> float:
     numberOfDrones = len(actions)
     numberOfTimes = len(actions[0])
-    # Worst case is considered as every drone spending every instant over an obstacle
     worstCase = numberOfDrones * numberOfTimes
     flat_obs = flatten_obstacles(areaDims)
 
@@ -130,14 +126,11 @@ def evaluateObstacles(actions: list[list[ACTION]], areaDims: coordObject) -> flo
 
     return 1 - timeOnObs / worstCase
 
-def evaluatePOICoverage(actions: list[list[ACTION]], areaDims: coordObject) -> float:
-    area,_ = populateArea(actions, areaDims)
+def evaluatePOICoverage(actions: list[list[ACTION]], areaDims: coordObject,area: list[list[list[int]]]) -> float:
     timeSpentNeedy = [0 for _ in POIS]
     lastVisit = [0 for _ in POIS]
     time = len(actions[0])
-    # list of objects is needed to access aux functions
     pois = [POI(coords, 0, 0) for coords in POIS]
-
     for t in range(time):
         for i, poi in enumerate(pois):
             coords = poi.getSection(areaDims)
@@ -160,8 +153,7 @@ def evaluatePOICoverage(actions: list[list[ACTION]], areaDims: coordObject) -> f
     return 1 - totalTimeSpentNeedy/maximumNeediness
 
 # This function will give  the best score if for all times there at least one drone outside base
-def evaluateDroneUpTime(actions: list[list[ACTION]], areaDims: coordObject) -> float:
-    area,_ = populateArea(actions, areaDims)
+def evaluateDroneUpTime(actions: list[list[ACTION]], areaDims: coordObject,area:list[list[list[int]]]) -> float:
     time = len(actions[0])
     dronesUp = 0
     breaked = False
@@ -182,13 +174,10 @@ def evaluateDroneUpTime(actions: list[list[ACTION]], areaDims: coordObject) -> f
 
 def evaluate(grid:list[list[ACTION]]):
     gridDimensions = DIM
-    # Lets check all drone routes are valid
     area,timeOOB = populateArea(grid,gridDimensions)
-    # Further evaluators must be added to this dictionary
     evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage, 'Uptime': evaluateDroneUpTime}
-    evaluateMetric = lambda eval: eval(grid,gridDimensions)
+    evaluateMetric = lambda eval: eval(grid,gridDimensions,area)
     results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
-    # Out of bound is elevated to 8 so as to exascervate errors in this field
     results['OutOfBound'] = (1 - timeOOB / (len(grid) * len(grid[0]))) ** 8
     accumulator = 0
     for v in results.values():
