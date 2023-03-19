@@ -66,7 +66,7 @@ for epoch in range(constants.EPOCHS):
         evals.append(eval_avg)
 
         g_loss += train_generator(discriminator,
-                                  g_optim, data_fake, eval_tensor)
+                                  g_optim, data_fake, eval_tensor, epoch)
 
         epoch_g_loss = g_loss / i
         epoch_d_loss = d_loss / i

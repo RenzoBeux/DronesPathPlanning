@@ -1,4 +1,4 @@
-from torch.nn import Module, Linear, Sequential, Tanh, LeakyReLU .
+from torch.nn import Module, Linear, Sequential, Tanh, LeakyReLU
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
 from constants import constants
