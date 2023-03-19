@@ -26,26 +26,24 @@ def parseMoves(listOfLists: list[list[int]]) -> list[ACTION]:
 
 
 def populateArea(actions: list[list[ACTION]], areaDims: coordObject) -> tuple[list[list[list[int]]],int]:
-    # res will have areadims.x * areadims.y elements
     res: list[list[list[int]]] = []
-    timeOOB = 0
-    # initialize res with 0s
+    currentPos: list[coordObject] = []
+    oob_pen:list[float] = []
+    total_time = len(actions[0])
+    time_oob = 0
+    num_uavs = len(actions)
     for i in range(areaDims.x):
         res.append([])
         for j in range(areaDims.y):
             res[i].append([])
-    # here we will store current pos for each drone
-    currentPos: list[coordObject] = []
-    # for each drone we will initialize his current point in 0,0
-    for i in range(len(actions)):
+
+    for i in range(num_uavs):
         currentPos.append(coordObject(0, 0))
-    # we mark the initial point of each drone as visited
-    for i in range(len(actions)):
+        oob_pen.append(0)
         res[currentPos[i].x][currentPos[i].y].append(0)
-    # for each drone
-    for i in range(len(actions)):
-        # we will iterate through the actions
+    for i in range(num_uavs):
         for j in range(len(actions[i])):
+            oob_penalize = 0
             chosenMove = actions[i][j]
             if chosenMove == ACTION.RIGHT:
                 currentPos[i].x = currentPos[i].x + 1
@@ -67,12 +65,21 @@ def populateArea(actions: list[list[ACTION]], areaDims: coordObject) -> tuple[li
             elif chosenMove == ACTION.DIAG_UP_RIGHT:
                 currentPos[i].y = currentPos[i].y + 1
                 currentPos[i].x = currentPos[i].x + 1
-            outOfBounds =not (currentPos[i].x in range(areaDims.x) and currentPos[i].y in range(areaDims.y))
-            if(outOfBounds):
-                timeOOB += 1
+            how_far_x = min(currentPos[i].x,areaDims.x - currentPos[i].x - 1)
+            how_far_y = min(currentPos[i].y,areaDims.y - currentPos[i].y - 1)
+            if how_far_x < 0 or how_far_y < 0:
+              time_oob += 1
+              oob_penalize += min(how_far_x,0)
+              oob_penalize += min(how_far_y,0)
+              oob_pen[i] += oob_penalize
             else:
-                res[currentPos[i].x][currentPos[i].y].append(j)
-    return res, timeOOB
+              res[currentPos[i].x][currentPos[i].y].append(j)
+    max_pen = 0
+    for pen in oob_pen:
+      if pen < max_pen:
+        max_pen = pen
+    max_pen = -max_pen/((total_time+1)*total_time)
+    return res, 1-max_pen, 1-time_oob/(num_uavs*total_time)
 
 
 def get_duplicates(array):
@@ -84,7 +91,7 @@ def get_duplicates(array):
 ################################################################################################################################################
 
 # This function evaluates the coverage of the area
-def evaluateCoverageArea(actions: list[list[ACTION]], areaDims: coordObject,area: list[list[list[int]]]) -> float:
+def evaluateCoverageArea(_: list[list[ACTION]], areaDims: coordObject,area: list[list[list[int]]]) -> float:
     numberOfSquares = areaDims.x * areaDims.y
     res = numberOfSquares
     for i in range(areaDims.x):
@@ -174,15 +181,16 @@ def evaluateDroneUpTime(actions: list[list[ACTION]], areaDims: coordObject,area:
 
 def evaluate(grid:list[list[ACTION]]):
     gridDimensions = DIM
-    area,timeOOB = populateArea(grid,gridDimensions)
+    area,oob_dist,oob_time = populateArea(grid,gridDimensions)
     evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage, 'Uptime': evaluateDroneUpTime}
     evaluateMetric = lambda eval: eval(grid,gridDimensions,area)
     results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
-    results['OutOfBound'] = (1 - timeOOB / (len(grid) * len(grid[0]))) ** 8
+    results['OutOfBound'] = (oob_dist + oob_time)/ 2
     accumulator = 0
     for v in results.values():
         accumulator += v
-    return accumulator/len(results)
+    # return accumulator/len(results)
+    return results['OutOfBound']
 
 def evaluateGAN(generatedList:list[list[int]]) -> dict[str,float] or None:
     """

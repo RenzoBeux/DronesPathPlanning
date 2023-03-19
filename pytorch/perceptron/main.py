@@ -26,6 +26,7 @@ discriminator = Discriminator().to(constants.device)
 d_loss_fun = BCELoss()
 g_loss_fun = BCELoss()
 e_loss_fun = BCELoss()
+c_loss_fun_fun = lambda g_weight, e_weight: g_weight * g_loss_fun + e_weight * e_loss_fun 
 g_optim = Adam(generator.parameters(), lr=constants.g_learn_rate)
 d_optim = Adam(discriminator.parameters(), lr=constants.d_learn_rate)
 
@@ -38,6 +39,7 @@ e_losses:list[float] = []
 images = []
 # Define the training loop
 for epoch in range(constants.EPOCHS):
+  c_loss_fun = c_loss_fun_fun(1-1/(epoch+1),1/(epoch+1))
   start = time()
   g_loss = 0.0
   d_loss = 0.0
