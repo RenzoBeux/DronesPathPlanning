@@ -160,10 +160,10 @@ def evaluateDroneUpTime(area: list[list[list[int]]],actions: list[list[ACTION]],
   return dronesUp/time
 
 def evaluate(grid:list[list[ACTION]]):
-    gridDimensions = DIM
+    gridDimensions = constants.DIM
     area,oob_dist,oob_time = populateArea(grid,gridDimensions)
     evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage, 'Uptime': evaluateDroneUpTime}
-    evaluateMetric = lambda eval: eval(grid,gridDimensions,area)
+    evaluateMetric = lambda eval: eval(area,grid,gridDimensions)
     results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
     results['OutOfBound'] = (oob_dist + oob_time)/ 2
     accumulator = 0
