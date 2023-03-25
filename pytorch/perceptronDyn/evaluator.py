@@ -146,17 +146,16 @@ def evaluateDroneUpTime(area: list[list[list[int]]],actions: list[list[ACTION]],
   return dronesUp/time
 
 def evaluate(grid:list[list[ACTION]]):
-    gridDimensions = constants.DIM
-    area,oob_dist,oob_time = populateArea(grid,gridDimensions)
-    evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage, 'Uptime': evaluateDroneUpTime}
-    evaluateMetric = lambda eval: eval(area,grid,gridDimensions)
-    results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
-    results['OutOfBound'] = (oob_dist + oob_time)/ 2
-    accumulator = 0
-    for v in results.values():
-        accumulator += v
-    # return accumulator/len(results)
-    return results['OutOfBound']
+  gridDimensions = constants.DIM
+  area,timeOOB = populateArea(grid,gridDimensions)
+  evaluators = {'Coverage':evaluateCoverageArea,'Collision':evaluateDronesCollision,'Obstacles':evaluateObstacles,'POIS':evaluatePOICoverage, 'Uptime': evaluateDroneUpTime}
+  evaluateMetric = lambda eval: eval(area,grid,gridDimensions)
+  results = {metric:evaluateMetric(eval) for metric, eval in evaluators.items()}
+  results['OutOfBound'] = (1 - timeOOB / (len(grid) * len(grid[0]))) ** 8
+  accumulator:float = 0
+  for v in results.values():
+    accumulator += v
+  return accumulator/len(results)
 
 def evaluateGAN(generatedList:list[list[int]]):
   """
