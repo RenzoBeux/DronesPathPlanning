@@ -32,8 +32,6 @@ d_optim = Adam(discriminator.parameters(), lr=constants.d_learn_rate)
 
 noise = create_noise(constants.sample_size, constants.NOISE_DIM)
 
-g_losses: list[float] = []
-d_losses: list[float] = []
 evals: list[float] = []
 e_losses: list[float] = []
 images = []
@@ -61,17 +59,15 @@ for epoch in range(constants.EPOCHS):
         move_list = output_to_moves(data_fake).tolist()
         evaluations = list(map(evaluateGAN, move_list))
         eval_tensor = FloatTensor(evaluations).to(constants.device)
-
         eval_avg = eval_tensor.mean()
         evals.append(eval_avg)
 
         g_loss += train_generator(discriminator,
                                   g_optim, data_fake, eval_tensor)
-
-        epoch_g_loss = g_loss / i
-        epoch_d_loss = d_loss / i
-        g_losses.append(epoch_g_loss)
-        d_losses.append(epoch_d_loss)
+        eval_tensor.detach()
+        del eval_tensor
+        epoch_g_loss = float(g_loss) / (i+1)
+        epoch_d_loss = float(d_loss) / (i+1)
     end = time()
     if epoch % 20 == 0:
         if not isdir('output'):

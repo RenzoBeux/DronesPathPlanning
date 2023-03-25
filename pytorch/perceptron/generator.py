@@ -37,4 +37,4 @@ def train_generator(discriminator: Discriminator, g_optimizer: Optimizer, data_f
     loss = loss_fun(output, real_label)
     loss.backward()
     g_optimizer.step()
-    return loss
+    return (loss)
