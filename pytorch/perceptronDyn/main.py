@@ -63,15 +63,15 @@ for epoch in range(constants.EPOCHS):
         eval_tensor = FloatTensor(evaluations).to(constants.device)
 
         eval_avg = eval_tensor.mean()
-        evals.append(eval_avg)
-
+        
         g_loss += train_generator(discriminator,
                                   g_optim, data_fake, eval_tensor, epoch)
+        
+        eval_tensor.detach()
+        del eval_tensor
 
-        epoch_g_loss = g_loss / i
-        epoch_d_loss = d_loss / i
-        g_losses.append(epoch_g_loss)
-        d_losses.append(epoch_d_loss)
+        epoch_g_loss = float(g_loss) / (i+1)
+        epoch_d_loss = float(d_loss) / (i+1)
     end = time()
     if epoch % 20 == 0:
         if not isdir('output'):
