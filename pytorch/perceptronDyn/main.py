@@ -1,7 +1,7 @@
 from os import makedirs
 from os.path import isdir
 from time import time
-from torch import FloatTensor, save, load
+from torch import FloatTensor
 from torch.nn import BCELoss
 from torch.optim import Adam
 
@@ -13,32 +13,12 @@ from utils import create_noise, load_dataset, output_to_moves, tensor_to_file
 
 from CustomLoss import CustomLoss
 
-
-def save_checkpoint(model, optimizer, epoch, filename):
-    checkpoint = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-    }
-    save(checkpoint, filename)
-
-
-def load_checkpoint(model, optimizer, filename):
-    checkpoint = load(filename)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    epoch = checkpoint['epoch']
-
-    return model, optimizer, epoch
-
-
 print(f"Working on {constants.device}")
 route_loader, tensor_shape = load_dataset()
 
 print(f"dataset_size {tensor_shape[0]}")
 print(f"uav_amount: {tensor_shape[1]}")
 print(f"time_length: {tensor_shape[2]}")
-
 
 # Instantiate the generator and discriminator networks
 generator = Generator(constants.NOISE_DIM).to(constants.device)
@@ -52,6 +32,8 @@ d_optim = Adam(discriminator.parameters(), lr=constants.d_learn_rate)
 
 noise = create_noise(constants.sample_size, constants.NOISE_DIM)
 
+g_losses: list[float] = []
+d_losses: list[float] = []
 evals: list[float] = []
 e_losses: list[float] = []
 images = []
@@ -79,13 +61,15 @@ for epoch in range(constants.EPOCHS):
         move_list = output_to_moves(data_fake).tolist()
         evaluations = list(map(evaluateGAN, move_list))
         eval_tensor = FloatTensor(evaluations).to(constants.device)
-        eval_avg = eval_tensor.mean()
-        evals.append(eval_avg)
 
+        eval_avg = eval_tensor.mean()
+        
         g_loss += train_generator(discriminator,
-                                  g_optim, data_fake, eval_tensor)
+                                  g_optim, data_fake, eval_tensor, epoch)
+        
         eval_tensor.detach()
         del eval_tensor
+
         epoch_g_loss = float(g_loss) / (i+1)
         epoch_d_loss = float(d_loss) / (i+1)
     end = time()

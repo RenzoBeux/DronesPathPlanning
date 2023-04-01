@@ -48,4 +48,4 @@ def train_discriminator(discriminator:Discriminator,loss_fun:_Loss, d_optimizer:
   loss_real.backward()
   loss_fake.backward()
   d_optimizer.step()
-  return (loss_real + loss_fake)
+  return loss_real + loss_fake

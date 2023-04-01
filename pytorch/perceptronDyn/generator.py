@@ -28,13 +28,15 @@ class Generator(Module):
         return self.main(x).view(-1, constants.uav_amount, constants.time_lenght)
 
 
-def train_generator(discriminator: Discriminator, g_optimizer: Optimizer, data_fake, eval_tensor):
+def train_generator(discriminator: Discriminator, g_optimizer: Optimizer, data_fake, eval_tensor, epoch):
     curr_batch_size = data_fake.size(0)
     real_label = label_real(curr_batch_size)
     g_optimizer.zero_grad()
     output = discriminator(data_fake)
-    loss_fun = CustomLoss(eval_tensor, 0.2, 0.8)
+    evalWight = epoch / constants.EPOCHS
+    regularWeight = 1 - evalWight
+    loss_fun = CustomLoss(eval_tensor, evalWight, regularWeight)
     loss = loss_fun(output, real_label)
     loss.backward()
     g_optimizer.step()
-    return (loss)
+    return loss
