@@ -1,9 +1,11 @@
 from os import makedirs
-from os.path import isdir
+from os.path import isdir, exists
 from time import time
 from torch import FloatTensor
 from torch.nn import BCELoss
 from torch.optim import Adam
+from torch.save import save
+
 
 from constants import constants
 from evaluator import evaluateGAN, evaluator_loss
@@ -85,3 +87,7 @@ for epoch in range(constants.EPOCHS):
 generated_img = generator(noise).cpu().detach()
 move_tensor = output_to_moves(generated_img)
 tensor_to_file(move_tensor, f'output/test.{constants.EPOCHS}')
+
+# Save the models
+save(generator.state_dict(), '/generator_model.pth')
+save(discriminator.state_dict(), '/discriminator_model.pth')
