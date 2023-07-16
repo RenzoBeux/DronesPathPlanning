@@ -40,15 +40,15 @@ class Constants_Class(object):
             for section in sectionList:
                 isAccounted = False
                 for alreadyAccounted in flat_obs:
-                    if(alreadyAccounted.x == section.x and alreadyAccounted.y == section.y):
+                    if (alreadyAccounted.x == section.x and alreadyAccounted.y == section.y):
                         isAccounted = True
                         break
-                if(not isAccounted):
+                if (not isAccounted):
                     flat_obs.append(section)
         self.FLAT_OBSTACLES = flat_obs
 
     BATCH_SIZE = 32
-    EPOCHS = 1
+    EPOCHS = 256
     NOISE_DIM = 128  # latent vector size
     K = 1  # number of steps to apply to the discriminator
     sample_size = 3  # fixed sample size

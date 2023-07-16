@@ -28,7 +28,7 @@ if __name__ == "__main__":
                 os.system('cp constants.py output/constants.py')
 
             # runGreedy(1,90/100)
-            for k in range(60, 100):
+            for k in range(1, 100):
                 for i in range(1, 30):
                     runGreedy(i, k/100)
         # Print UAVs flight
