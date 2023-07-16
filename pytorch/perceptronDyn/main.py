@@ -1,10 +1,9 @@
 from os import makedirs
 from os.path import isdir, exists
 from time import time
-from torch import FloatTensor
+from torch import FloatTensor,manual_seed
 from torch.nn import BCELoss
 from torch.optim import Adam
-from torch import save
 
 
 from constants import constants
@@ -15,6 +14,7 @@ from utils import create_noise, load_dataset, output_to_moves, tensor_to_file
 
 from CustomLoss import CustomLoss
 
+manual_seed(42)
 print(f"Working on {constants.device}")
 route_loader, tensor_shape = load_dataset()
 
