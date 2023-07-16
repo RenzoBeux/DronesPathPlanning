@@ -38,8 +38,8 @@ def train_generator(discriminator: Discriminator, g_optimizer: Optimizer, data_f
     # regularWeight = 1 - evalWeight
 
     # Apply non-linear transformation using exp function
-    evalWeight = 1.5 * np.exp(-epoch / constants.EPOCHS)
-    regularWeight = 0.5 * np.exp(epoch / constants.EPOCHS)
+    evalWeight = epoch/constants.EPOCHS
+    regularWeight = (constants.EPOCHS-epoch)/constants.EPOCHS
 
     loss_fun = CustomLoss(eval_tensor, evalWeight, regularWeight)
     loss = loss_fun(output, real_label)
