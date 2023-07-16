@@ -7,7 +7,7 @@ from torch.optim import Adam
 
 
 from constants import constants
-from evaluator import evaluateGAN, evaluator_loss
+from evaluator import evaluateGAN
 from discriminator import Discriminator, train_discriminator
 from generator import Generator, train_generator
 from utils import create_noise, load_dataset, output_to_moves, tensor_to_file
