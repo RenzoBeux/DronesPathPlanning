@@ -47,15 +47,15 @@ class Constants_Class(object):
                     flat_obs.append(section)
         self.FLAT_OBSTACLES = flat_obs
 
-    BATCH_SIZE = 32
-    EPOCHS = 2000
-    NOISE_DIM = 128  # latent vector size
+    BATCH_SIZE = 16
+    EPOCHS = 4000
+    NOISE_DIM = 64  # latent vector size
     K = 3  # number of steps to apply to the discriminator
     sample_size = 3  # fixed sample size
     device
     uav_amount: int = -1
     time_lenght: int = -1
-    g_learn_rate: float = 0.0002
+    g_learn_rate: float = 0.00022
     d_learn_rate: float = 0.0002
 
     # SCENARIO

@@ -18,7 +18,7 @@ from CustomLoss import CustomLoss
 
 def objective(trial):
     # Define the hyperparameters to optimize
-    g_learn_rate = trial.suggest_loguniform('g_learn_rate', 1e-3, 1e-1)
+    g_learn_rate = trial.suggest_loguniform('g_learn_rate', 1e-4, 1e-1)
     d_learn_rate = trial.suggest_loguniform('d_learn_rate', 1e-4, 1e-1)
     noise_dim = trial.suggest_int('noise_dim', 10, 128)
     # Set the constants with the optimized hyperparameters
