@@ -6,10 +6,10 @@ from Obstacle import Obstacle
 #################################
 ##########CONTEXT################
 #################################
-DIM = coordObject(10, 10)
+DIM = coordObject(15, 15)
 BIGDIM = coordObject(30, 30)
 ORIGIN = coordObject(0, 0)
-UAVAMOUNT = 2
+UAVAMOUNT = 1
 TIMELENGTH = 200
 POIS = [coordObject(0.031, 0.909), coordObject(0.56, 0.09)]
 POIS_TIMES = [10, 18, 18, 18]
@@ -19,8 +19,8 @@ OBSTACLES = [
 
 OBS_PUNISH = 0.9
 # Time to charge must be aprox 2.5 times the BATTERY_CAPACITY
-BATTERY_CAPACITY = 80
-TIME_TO_CHARGE = 120
+BATTERY_CAPACITY = 40
+TIME_TO_CHARGE = 80
 
 
 PAUSE_TIME = 0
