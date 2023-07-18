@@ -23,6 +23,9 @@ print(f"dataset_size {tensor_shape[0]}")
 print(f"uav_amount: {tensor_shape[1]}")
 print(f"time_length: {tensor_shape[2]}")
 
+# Print the constants
+print(constants)
+
 # Instantiate the generator and discriminator networks
 generator = Generator(constants.NOISE_DIM).to(constants.device)
 discriminator = Discriminator().to(constants.device)
@@ -89,5 +92,5 @@ move_tensor = output_to_moves(generated_img)
 tensor_to_file(move_tensor, f"output/test.{constants.EPOCHS}")
 
 # Save the models
-save(generator.state_dict(), "generator_model.pth")
-save(discriminator.state_dict(), "discriminator_model.pth")
+save(generator.state_dict(), "output/generator_model.pth")
+save(discriminator.state_dict(), "output/discriminator_model.pth")
