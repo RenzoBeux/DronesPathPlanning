@@ -48,7 +48,7 @@ class Constants_Class(object):
         self.FLAT_OBSTACLES = flat_obs
 
     BATCH_SIZE = 16
-    EPOCHS = 4000
+    EPOCHS = 2000
     NOISE_DIM = 64  # latent vector size
     K = 3  # number of steps to apply to the discriminator
     sample_size = 3  # fixed sample size
