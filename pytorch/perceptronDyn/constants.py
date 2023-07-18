@@ -5,7 +5,7 @@ from torch import device, cuda, tensor
 
 class Constants_Class(object):
     def __new__(cls):
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(Constants_Class, cls).__new__(cls)
         return cls.instance
 
@@ -14,36 +14,39 @@ class Constants_Class(object):
         self.set_device()
 
     def set_uav_amount_and_time(self):
-        input_files = listdir('./input')
+        input_files = listdir("./input")
         single_file = listdir(f"./input/{input_files[0]}")
-        file = open(f"./input/{input_files[0]}/{single_file[0]}", 'r')
+        file = open(f"./input/{input_files[0]}/{single_file[0]}", "r")
         file_lines = file.readlines()
         file.close()
-        file_routes = list(
-            map(lambda x: [list(map(int, x.split(' ')))], file_lines))
+        file_routes = list(map(lambda x: [list(map(int, x.split(" ")))], file_lines))
         files_tensor_routes = tensor(file_routes, dtype=int)
         self.uav_amount = files_tensor_routes.shape[0]
         self.time_lenght = files_tensor_routes.shape[2]
 
     def set_device(self):
-        self.device = device('cuda' if cuda.is_available() else 'cpu')
+        self.device = device("cuda" if cuda.is_available() else "cpu")
 
     def set_flat_obstacles(self, areaDims: coordObject):
         """
         Returns a list of all of the coordinates which are considered occupied by obstacles
         """
         obstaclesBySections: list[list[coordObject]] = list(
-            map(lambda obs: obs.toSections(self.DIM), self.OBSTACLES))
+            map(lambda obs: obs.toSections(self.DIM), self.OBSTACLES)
+        )
         flat_obs: list[coordObject] = []
         # Suboptimal as all hell
         for sectionList in obstaclesBySections:
             for section in sectionList:
                 isAccounted = False
                 for alreadyAccounted in flat_obs:
-                    if(alreadyAccounted.x == section.x and alreadyAccounted.y == section.y):
+                    if (
+                        alreadyAccounted.x == section.x
+                        and alreadyAccounted.y == section.y
+                    ):
                         isAccounted = True
                         break
-                if(not isAccounted):
+                if not isAccounted:
                     flat_obs.append(section)
         self.FLAT_OBSTACLES = flat_obs
 
@@ -55,7 +58,7 @@ class Constants_Class(object):
     device
     uav_amount: int = -1
     time_lenght: int = -1
-    g_learn_rate: float = 0.00022
+    g_learn_rate: float = 0.0002
     d_learn_rate: float = 0.0002
 
     # SCENARIO
@@ -63,7 +66,7 @@ class Constants_Class(object):
     POIS = [coordObject(0.031, 0.909), coordObject(0.56, 0.09)]
     POIS_TIMES = [10, 18, 18, 18]
     DIM = coordObject(15, 15)
-    metrics = ['Coverage', 'Collision', 'Obstacles', 'POIS', 'Uptime']
+    metrics = ["Coverage", "Collision", "Obstacles", "POIS", "Uptime"]
     OBSTACLES = [Obstacle(coordObject(0.94, 0.4), coordObject(0.95, 0.5), 1)]
     FLAT_OBSTACLES: list[coordObject] = []
 
