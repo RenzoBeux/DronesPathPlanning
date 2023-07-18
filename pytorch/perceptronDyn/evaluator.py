@@ -195,7 +195,7 @@ def evaluate(grid: list[list[ACTION]]):
     }
     evaluateMetric = lambda eval: eval(area, grid, gridDimensions)
     results = {metric: evaluateMetric(eval) for metric, eval in evaluators.items()}
-    results["OutOfBound"] = (oob_dist + oob_time) / 2
+    results["OutOfBound"] = ((oob_dist + oob_time) / 2) ** 2
     accumulator = 0
     for v in results.values():
         accumulator += v

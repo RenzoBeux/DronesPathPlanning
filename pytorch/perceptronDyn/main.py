@@ -1,7 +1,7 @@
 from os import makedirs
 from os.path import isdir, exists
 from time import time
-from torch import FloatTensor,manual_seed
+from torch import FloatTensor, manual_seed
 from torch.nn import BCELoss
 from torch.optim import Adam
 
@@ -11,6 +11,7 @@ from evaluator import evaluateGAN
 from discriminator import Discriminator, train_discriminator
 from generator import Generator, train_generator
 from utils import create_noise, load_dataset, output_to_moves, tensor_to_file
+from torch import save
 
 from CustomLoss import CustomLoss
 
@@ -51,43 +52,42 @@ for epoch in range(constants.EPOCHS):
         curr_batch_size = images.size(0)
 
         for step in range(constants.K):  # Optional if we always consider k as 1
-            data_fake = generator(create_noise(
-                curr_batch_size, constants.NOISE_DIM))
+            data_fake = generator(create_noise(curr_batch_size, constants.NOISE_DIM))
             data_real = images
-            d_loss += train_discriminator(discriminator,
-                                          d_loss_fun, d_optim, data_real, data_fake)
+            d_loss += train_discriminator(
+                discriminator, d_loss_fun, d_optim, data_real, data_fake
+            )
 
-        data_fake = generator(create_noise(
-            curr_batch_size, constants.NOISE_DIM))
+        data_fake = generator(create_noise(curr_batch_size, constants.NOISE_DIM))
 
         move_list = output_to_moves(data_fake).tolist()
         evaluations = list(map(evaluateGAN, move_list))
         eval_tensor = FloatTensor(evaluations).to(constants.device)
 
         eval_avg = eval_tensor.mean()
-        
-        g_loss += train_generator(discriminator,
-                                  g_optim, data_fake, eval_tensor, epoch)
-        
+
+        g_loss += train_generator(discriminator, g_optim, data_fake, eval_tensor, epoch)
+
         eval_tensor.detach()
         del eval_tensor
 
-        epoch_g_loss = float(g_loss) / (i+1)
-        epoch_d_loss = float(d_loss) / (i+1)
+        epoch_g_loss = float(g_loss) / (i + 1)
+        epoch_d_loss = float(d_loss) / (i + 1)
     end = time()
     if epoch % 20 == 0:
-        if not isdir('output'):
-            makedirs('output')
+        if not isdir("output"):
+            makedirs("output")
         generated_img = generator(noise).cpu().detach()
         move_tensor = output_to_moves(generated_img)
-        tensor_to_file(move_tensor, f'output/test.{epoch}')
+        tensor_to_file(move_tensor, f"output/test.{epoch}")
 
     print(
-        f"Epoch: {epoch} time: {end-start} eval: {eval_avg} combined_loss: {epoch_g_loss} d_loss: {epoch_d_loss}")
+        f"Epoch: {epoch} time: {end-start} eval: {eval_avg} combined_loss: {epoch_g_loss} d_loss: {epoch_d_loss}"
+    )
 generated_img = generator(noise).cpu().detach()
 move_tensor = output_to_moves(generated_img)
-tensor_to_file(move_tensor, f'output/test.{constants.EPOCHS}')
+tensor_to_file(move_tensor, f"output/test.{constants.EPOCHS}")
 
 # Save the models
-save(generator.state_dict(), 'generator_model.pth')
-save(discriminator.state_dict(), 'discriminator_model.pth')
+save(generator.state_dict(), "generator_model.pth")
+save(discriminator.state_dict(), "discriminator_model.pth")
