@@ -16,6 +16,9 @@ from utils import create_noise, load_dataset, output_to_moves, tensor_to_file
 
 from CustomLoss import CustomLoss
 
+from joblib import dump, load
+
+
 
 def objective(trial):
     # Define the hyperparameters to optimize
@@ -106,6 +109,7 @@ def objective(trial):
     # save(discriminator.state_dict(), 'discriminator_model.pth')
 
     # Return the evaluation metric to optimize
+    
     return float(eval_avg)
 
 
@@ -118,8 +122,22 @@ print(f"dataset_size {tensor_shape[0]}")
 print(f"uav_amount: {tensor_shape[1]}")
 print(f"time_length: {tensor_shape[2]}")
 
+checkpoint_file = 'optuna_checkpoint.joblib'
+if exists(checkpoint_file):
+    study = load(checkpoint_file)
+else:
+    study = optuna.create_study(direction="maximize")
+
+def save_checkpoint(study, trial):
+    if trial.number % 2 == 0:  # save every 2 trials
+        dump(study, checkpoint_file)
+
+study.optimize(objective, n_trials=100, callbacks=[save_checkpoint])
+
+
 study = optuna.create_study(direction="maximize")
 study.optimize(objective, n_trials=100)
+
 
 # Print the best hyperparameters and evaluation metric
 print("Best trial:")
