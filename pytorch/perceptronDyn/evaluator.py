@@ -200,7 +200,7 @@ def evaluate(grid: list[list[ACTION]]):
     for v in results.values():
         accumulator += v
     # return accumulator/len(results)
-    return results["OutOfBound"]
+    return (results["OutOfBound"] + results["Coverage"]) / 2
 
 
 def evaluateGAN(generatedList: list[list[int]]):
