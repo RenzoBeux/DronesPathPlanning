@@ -133,8 +133,7 @@ else:
 
 
 def save_checkpoint(study, trial):
-    if trial.number % 2 == 0:  # save every 2 trials
-        dump(study, checkpoint_file)
+    dump(study, checkpoint_file)
 
 
 study.optimize(
