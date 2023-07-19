@@ -123,8 +123,12 @@ print(f"time_length: {tensor_shape[2]}")
 
 checkpoint_file = "optuna_checkpoint.joblib"
 if exists(checkpoint_file):
+    print("Loading checkpoint")
     study = load(checkpoint_file)
+    print("Checkpoint loaded")
+    print(f"Number of finished trials: {len(study.trials)}")
 else:
+    print("Creating new study")
     study = optuna.create_study(direction="maximize")
 
 
@@ -136,11 +140,6 @@ def save_checkpoint(study, trial):
 study.optimize(
     objective, n_trials=100, callbacks=[save_checkpoint], gc_after_trial=True
 )
-
-
-study = optuna.create_study(direction="maximize")
-study.optimize(objective, n_trials=100)
-
 
 # Print the best hyperparameters and evaluation metric
 print("Best trial:")
