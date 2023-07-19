@@ -24,7 +24,12 @@ print(f"uav_amount: {tensor_shape[1]}")
 print(f"time_length: {tensor_shape[2]}")
 
 # Print the constants
-print(constants)
+print(f"NOISE_DIM: {constants.NOISE_DIM}")
+print(f"sample_size: {constants.sample_size}")
+print(f"K: {constants.K}")
+print(f"EPOCHS: {constants.EPOCHS}")
+print(f"g_learn_rate: {constants.g_learn_rate}")
+print(f"d_learn_rate: {constants.d_learn_rate}")
 
 # Instantiate the generator and discriminator networks
 generator = Generator(constants.NOISE_DIM).to(constants.device)
