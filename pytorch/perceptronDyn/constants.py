@@ -1,6 +1,8 @@
 from os import listdir
 from classes import coordObject, Obstacle
 from torch import device, cuda, tensor
+from WeightApproach import WeightApproach
+from WeightApproach import WeightApproachEnum
 
 
 class Constants_Class(object):
@@ -50,17 +52,19 @@ class Constants_Class(object):
                     flat_obs.append(section)
         self.FLAT_OBSTACLES = flat_obs
 
+    weightApproach = WeightApproachEnum.EXPONENTIAL_SIGMOID
     BATCH_SIZE = 16
-    EPOCHS = 2000
+    EPOCHS = 4000
     NOISE_DIM = 64  # latent vector size
     K = 3  # number of steps to apply to the discriminator
     sample_size = 3  # fixed sample size
     device
     uav_amount: int = -1
     time_lenght: int = -1
-    g_learn_rate: float = 0.0002
+    g_learn_rate: float = 0.00022
     d_learn_rate: float = 0.0002
 
+    WeightApproach(weightApproach, EPOCHS)
     # SCENARIO
     ORIGIN = coordObject(0, 0)
     POIS = [coordObject(0.031, 0.909), coordObject(0.56, 0.09)]
@@ -69,6 +73,8 @@ class Constants_Class(object):
     metrics = ["Coverage", "Collision", "Obstacles", "POIS", "Uptime"]
     OBSTACLES = [Obstacle(coordObject(0.94, 0.4), coordObject(0.95, 0.5), 1)]
     FLAT_OBSTACLES: list[coordObject] = []
+    BATTERY_CAPACITY = 40
+    TIME_TO_CHARGE = 80
 
 
 constants = Constants_Class()

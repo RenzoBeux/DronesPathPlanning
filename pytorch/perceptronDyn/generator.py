@@ -6,7 +6,7 @@ import math
 import numpy as np
 from utils import label_real
 from discriminator import Discriminator
-
+from WeightApproach import WeightApproach
 from CustomLoss import CustomLoss
 
 
@@ -29,17 +29,17 @@ class Generator(Module):
         return self.main(x).view(-1, constants.uav_amount, constants.time_lenght)
 
 
-def train_generator(discriminator: Discriminator, g_optimizer: Optimizer, data_fake, eval_tensor, epoch):
+def train_generator(
+    discriminator: Discriminator, g_optimizer: Optimizer, data_fake, eval_tensor, epoch
+):
     curr_batch_size = data_fake.size(0)
     real_label = label_real(curr_batch_size)
     g_optimizer.zero_grad()
     output = discriminator(data_fake)
-    # evalWeight = epoch / constants.EPOCHS
-    # regularWeight = 1 - evalWeight
 
-    # Apply non-linear transformation using exp function
-    evalWeight = epoch/constants.EPOCHS
-    regularWeight = (constants.EPOCHS-epoch)/constants.EPOCHS
+    evalWeight, regularWeight = WeightApproach.get_instance().get_weights(epoch)
+
+    print(f"evalWeight: {evalWeight}, regularWeight: {regularWeight}")
 
     loss_fun = CustomLoss(eval_tensor, evalWeight, regularWeight)
     loss = loss_fun(output, real_label)

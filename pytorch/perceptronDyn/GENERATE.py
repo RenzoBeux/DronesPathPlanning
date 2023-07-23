@@ -3,12 +3,15 @@ from constants import constants
 import torch
 from generator import Generator
 from utils import create_noise, output_to_moves, tensor_to_file
+import sys
 
+# Get the file from the first argument
+file = sys.argv[1]
 
 
 # load the generator
 generator = Generator(constants.NOISE_DIM).to(constants.device)
-generator.load_state_dict(torch.load('generator_model.pth'))
+generator.load_state_dict(torch.load(file))
 
 # Make sure we are in evaluation mode
 generator.eval()
@@ -24,4 +27,4 @@ with torch.no_grad():
 
 # Save the generated images in txt file named GENERATOR.txt
 move_tensor = output_to_moves(generated_images)
-tensor_to_file(move_tensor, f'GENERATED.txt')
+tensor_to_file(move_tensor, f"GENERATED.txt")

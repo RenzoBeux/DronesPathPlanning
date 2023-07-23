@@ -183,6 +183,25 @@ def evaluateDroneUpTime(
     return dronesUp / time
 
 
+# The idea of this evaluations is that if the battery is used more than it is intended to, the evaluation will be worse
+# 0 will be the worst evaluation and it will reach 0 when the battery is used 1/3 more than it is intended to
+# We need to consider that while the drone is initially in the origin, it is not using battery after that if it passes through the origin
+# it will be using battery
+# def evaluateBatteryUsage(
+#     area: list[list[list[int]]], actions: list[list[ACTION]], areaDims: coordObject
+# ) -> float:
+#     time = len(actions[0])
+#     dronesUp = 0
+#     for t in range(time):
+#         for i in range(int(areaDims.x)):
+#             for j in range(int(areaDims.y)):
+#                 if i == constants.ORIGIN.x and j == constants.ORIGIN.y:
+#                     continue
+#                 if t in area[i][j]:
+#                     dronesUp += 1
+#     return 1 - dronesUp / (time * (1 + constants.))
+
+
 def evaluate(grid: list[list[ACTION]]):
     gridDimensions = constants.DIM
     area, oob_dist, oob_time = populateArea(grid, gridDimensions)
