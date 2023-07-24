@@ -6,6 +6,7 @@ parser = argparse.ArgumentParser()
 from collections import Counter
 from classes import coordObject, POI, ACTION
 from constants import constants
+from enum import Enum
 
 
 def parseFile(fileName) -> list[list[int]]:
@@ -202,34 +203,64 @@ def evaluateDroneUpTime(
 #     return 1 - dronesUp / (time * (1 + constants.))
 
 
-def evaluate(grid: list[list[ACTION]]):
+class EvaluatorModules(Enum):
+    COVERAGE = "Coverage"
+    COLLISION = "Collision"
+    OBSTACLES = "Obstacles"
+    POIS = "POIS"
+    UPTIME = "Uptime"
+    OUTOFBOUND = "OutOfBound"
+
+
+def evaluate(
+    grid: list[list[ACTION]], activeModules: list[EvaluatorModules] | None = None
+):
     gridDimensions = constants.DIM
     area, oob_dist, oob_time = populateArea(grid, gridDimensions)
-    evaluators = {
-        "Coverage": evaluateCoverageArea,
-        "Collision": evaluateDronesCollision,
-        "Obstacles": evaluateObstacles,
-        "POIS": evaluatePOICoverage,
-        "Uptime": evaluateDroneUpTime,
-    }
+    if activeModules is None:
+        evaluators = {
+            "Coverage": evaluateCoverageArea,
+            "Collision": evaluateDronesCollision,
+            "Obstacles": evaluateObstacles,
+            "POIS": evaluatePOICoverage,
+            "Uptime": evaluateDroneUpTime,
+            "OutOfBound": lambda _, __, ___: ((oob_dist + oob_time) / 2) ** 2,
+        }
+    else:
+        evaluators = {}
+        if EvaluatorModules.COVERAGE in activeModules:
+            evaluators["Coverage"] = evaluateCoverageArea
+        if EvaluatorModules.COLLISION in activeModules:
+            evaluators["Collision"] = evaluateDronesCollision
+        if EvaluatorModules.OBSTACLES in activeModules:
+            evaluators["Obstacles"] = evaluateObstacles
+        if EvaluatorModules.POIS in activeModules:
+            evaluators["POIS"] = evaluatePOICoverage
+        if EvaluatorModules.UPTIME in activeModules:
+            evaluators["Uptime"] = evaluateDroneUpTime
+        if EvaluatorModules.OUTOFBOUND in activeModules:
+            evaluators["OutOfBound"] = (
+                lambda _, __, ___: ((oob_dist + oob_time) / 2) ** 2
+            )
     evaluateMetric = lambda eval: eval(area, grid, gridDimensions)
     results = {metric: evaluateMetric(eval) for metric, eval in evaluators.items()}
-    results["OutOfBound"] = ((oob_dist + oob_time) / 2) ** 2
     accumulator = 0
     for v in results.values():
         accumulator += v
-    # return accumulator/len(results)
-    return (results["OutOfBound"] + results["Coverage"]) / 2
+    return accumulator / len(results)
 
 
-def evaluateGAN(generatedList: list[list[int]]):
+def evaluateGAN(
+    generatedList: list[list[int]], activeModules: list[EvaluatorModules] | None = None
+):
     """
+    activeModules: List of the modules to be used in the evaluation, if None all will be used
     Returns:
         Dict[str, float]: Dictionary with the results of the evaluation
         None: If the generated list is invalid
     """
     parsedList = parseMoves(generatedList)
-    return evaluate(parsedList)
+    return evaluate(parsedList, activeModules)
 
 
 def evaluate_file(file: str):

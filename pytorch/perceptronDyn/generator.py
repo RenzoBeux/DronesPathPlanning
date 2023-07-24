@@ -6,7 +6,7 @@ import math
 import numpy as np
 from utils import label_real
 from discriminator import Discriminator
-from WeightApproach import WeightApproach
+from approaches import WeightApproach
 from CustomLoss import CustomLoss
 
 

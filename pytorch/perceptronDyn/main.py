@@ -13,6 +13,10 @@ from generator import Generator, train_generator
 from utils import create_noise, load_dataset, output_to_moves, tensor_to_file
 from torch import save
 
+from evaluator import EvaluatorModules
+
+from approaches import EvaluatorModuleApproach
+
 from CustomLoss import CustomLoss
 
 manual_seed(42)
@@ -70,7 +74,12 @@ for epoch in range(constants.EPOCHS):
         data_fake = generator(create_noise(curr_batch_size, constants.NOISE_DIM))
 
         move_list = output_to_moves(data_fake).tolist()
-        evaluations = list(map(evaluateGAN, move_list))
+        evaluatorModules = EvaluatorModuleApproach.get_instance().get_evaluator_modules(
+            epoch
+        )
+        evaluations = list(
+            map(lambda x: evaluateGAN(x, evaluatorModules), move_list)
+        )
         eval_tensor = FloatTensor(evaluations).to(constants.device)
 
         eval_avg = eval_tensor.mean()

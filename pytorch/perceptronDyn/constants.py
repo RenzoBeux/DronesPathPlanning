@@ -1,8 +1,12 @@
 from os import listdir
 from classes import coordObject, Obstacle
 from torch import device, cuda, tensor
-from WeightApproach import WeightApproach
-from WeightApproach import WeightApproachEnum
+from approaches import (
+    WeightApproach,
+    WeightApproachEnum,
+    EvaluatorModuleApproachEnum,
+    EvaluatorModuleApproach,
+)
 
 
 class Constants_Class(object):
@@ -53,8 +57,9 @@ class Constants_Class(object):
         self.FLAT_OBSTACLES = flat_obs
 
     weightApproach = WeightApproachEnum.EXPONENTIAL_SIGMOID
+    evaluatorModuleApproach = EvaluatorModuleApproachEnum.CONSTANT
     BATCH_SIZE = 16
-    EPOCHS = 4000
+    EPOCHS = 10
     NOISE_DIM = 64  # latent vector size
     K = 3  # number of steps to apply to the discriminator
     sample_size = 3  # fixed sample size
@@ -65,6 +70,7 @@ class Constants_Class(object):
     d_learn_rate: float = 0.0002
 
     WeightApproach(weightApproach, EPOCHS)
+    EvaluatorModuleApproach(evaluatorModuleApproach, EPOCHS)
     # SCENARIO
     ORIGIN = coordObject(0, 0)
     POIS = [coordObject(0.031, 0.909), coordObject(0.56, 0.09)]
