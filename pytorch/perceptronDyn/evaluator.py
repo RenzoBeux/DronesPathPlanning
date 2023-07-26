@@ -266,13 +266,13 @@ def evaluateGAN(
     return evaluate(parsedList, activeModules)
 
 
-def evaluate_file(file: str):
+def evaluate_file(file: str,  activeModules: list[EvaluatorModules] | None = None):
     with open(file, "r") as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]
     lines = [line.split(" ") for line in lines]
     lines = [[int(x) for x in line] for line in lines]
-    return evaluateGAN(lines)
+    return evaluateGAN(lines,activeModules)
 
 
 if __name__ == "__main__":
@@ -282,6 +282,6 @@ if __name__ == "__main__":
         )
         args = parser.parse_args()
 
-        print(evaluate_file(args.file))
+        print(evaluate_file(args.file, [EvaluatorModules.BATTERY]))
     except:
         traceback.print_exc()
