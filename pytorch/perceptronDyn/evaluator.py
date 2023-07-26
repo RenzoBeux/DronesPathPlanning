@@ -26,61 +26,81 @@ def parseMoves(listOfLists: list[list[int]]) -> list[list[ACTION]]:
 
 def populateArea(
     actions: list[list[ACTION]], areaDims: coordObject
-) -> tuple[list[list[list[int]]], float, float]:
+) -> tuple[list[list[list[int]]], float, float, float]:
     res: list[list[list[int]]] = []
     currentPos: list[coordObject] = []
     oob_pen: list[float] = []
     total_time = len(actions[0])
     time_oob = 0
     num_uavs = len(actions)
+    ooBattery = [1.0 for _ in range(num_uavs)]
+    # UAVs start with constants.BATTERY_CAPACITY battery
+    uav_battery = [float(constants.BATTERY_CAPACITY) for _ in range(num_uavs)]
+    # This builds the 2d array representing the area
     for i in range(int(areaDims.x)):
         res.append([])
         for j in range(int(areaDims.y)):
             res[i].append([])
-
+    # Initializes all drones in currentPos, oob_pen and res
+    # currentPos is a list of coordObjects, each one representing the current position of a drone
+    # oob_pen is a list of floats, each one representing the penalty of a drone
+    # res is a 2d array of lists of ints, each one representing the time in which a drone is in that position
     for i in range(num_uavs):
         currentPos.append(coordObject(0, 0))
         oob_pen.append(0)
         res[int(currentPos[i].x)][int(currentPos[i].y)].append(0)
-    for i in range(num_uavs):
-        for j in range(len(actions[i])):
+    for uav in range(num_uavs):
+        for time in range(len(actions[uav])):
             oob_penalize = 0
-            chosenMove = actions[i][j]
+            chosenMove = actions[uav][time]
             if chosenMove == ACTION.RIGHT:
-                currentPos[i].x = currentPos[i].x + 1
+                currentPos[uav].x = currentPos[uav].x + 1
             elif chosenMove == ACTION.DIAG_DOWN_RIGHT:
-                currentPos[i].x = currentPos[i].x + 1
-                currentPos[i].y = currentPos[i].y - 1
+                currentPos[uav].x = currentPos[uav].x + 1
+                currentPos[uav].y = currentPos[uav].y - 1
             elif chosenMove == ACTION.DOWN:
-                currentPos[i].y = currentPos[i].y - 1
+                currentPos[uav].y = currentPos[uav].y - 1
             elif chosenMove == ACTION.DIAG_DOWN_LEFT:
-                currentPos[i].y = currentPos[i].y - 1
-                currentPos[i].x = currentPos[i].x - 1
+                currentPos[uav].y = currentPos[uav].y - 1
+                currentPos[uav].x = currentPos[uav].x - 1
             elif chosenMove == ACTION.LEFT:
-                currentPos[i].x = currentPos[i].x - 1
+                currentPos[uav].x = currentPos[uav].x - 1
             elif chosenMove == ACTION.DIAG_UP_LEFT:
-                currentPos[i].x = currentPos[i].x - 1
-                currentPos[i].y = currentPos[i].y + 1
+                currentPos[uav].x = currentPos[uav].x - 1
+                currentPos[uav].y = currentPos[uav].y + 1
             elif chosenMove == ACTION.UP:
-                currentPos[i].y = currentPos[i].y + 1
+                currentPos[uav].y = currentPos[uav].y + 1
             elif chosenMove == ACTION.DIAG_UP_RIGHT:
-                currentPos[i].y = currentPos[i].y + 1
-                currentPos[i].x = currentPos[i].x + 1
-            how_far_x = min(currentPos[i].x, areaDims.x - currentPos[i].x - 1)
-            how_far_y = min(currentPos[i].y, areaDims.y - currentPos[i].y - 1)
+                currentPos[uav].y = currentPos[uav].y + 1
+                currentPos[uav].x = currentPos[uav].x + 1
+            # If it is in the origin and the action is STAY, it charges the battery
+            # We have to take into account that the battery charges from 0 to constants.BATTERY_CAPACITY in constants.TIME_TO_CHARGE
+            if currentPos[uav].x == constants.ORIGIN.x and currentPos[uav].y == constants.ORIGIN.y and chosenMove == ACTION.STAY and uav_battery[uav] < constants.BATTERY_CAPACITY:
+                uav_battery[uav] += ( constants.BATTERY_CAPACITY / constants.TIME_TO_CHARGE)
+            # If it is not in the origin it uses battery
+            elif currentPos[uav].x != constants.ORIGIN.x or currentPos[uav].y != constants.ORIGIN.y:
+                uav_battery[uav] -= 1
+            # If the battery is 0 or less, it is out of battery
+            # we need to penalize it, we want to make it 0 if the battery became more negative than -constants.BATTERY_CAPACITY/3
+            ooBatteryPenalization = 3/ constants.BATTERY_CAPACITY
+            if uav_battery[uav] <= 0:
+                ooBattery[uav] -= ooBatteryPenalization 
+            how_far_x = min(currentPos[uav].x, areaDims.x - currentPos[uav].x - 1)
+            how_far_y = min(currentPos[uav].y, areaDims.y - currentPos[uav].y - 1)
             if how_far_x < 0 or how_far_y < 0:
                 time_oob += 1
                 oob_penalize += min(how_far_x, 0)
                 oob_penalize += min(how_far_y, 0)
-                oob_pen[i] += oob_penalize
+                oob_pen[uav] += oob_penalize
             else:
-                res[int(currentPos[i].x)][int(currentPos[i].y)].append(j)
+                # in the 2d array (aka the area) we append the time in which the drone is in that position
+                res[int(currentPos[uav].x)][int(currentPos[uav].y)].append(time)
     max_pen = 0
     for pen in oob_pen:
         if pen < max_pen:
             max_pen = pen
     max_pen = -max_pen / ((total_time + 1) * total_time)
-    return res, 1 - max_pen, 1 - time_oob / (num_uavs * total_time)
+    return res, 1 - max_pen, 1 - time_oob / (num_uavs * total_time), sum(ooBattery) / (num_uavs)
 
 
 def get_duplicates(array):
@@ -183,26 +203,6 @@ def evaluateDroneUpTime(
                     break
     return dronesUp / time
 
-
-# The idea of this evaluations is that if the battery is used more than it is intended to, the evaluation will be worse
-# 0 will be the worst evaluation and it will reach 0 when the battery is used 1/3 more than it is intended to
-# We need to consider that while the drone is initially in the origin, it is not using battery after that if it passes through the origin
-# it will be using battery
-# def evaluateBatteryUsage(
-#     area: list[list[list[int]]], actions: list[list[ACTION]], areaDims: coordObject
-# ) -> float:
-#     time = len(actions[0])
-#     dronesUp = 0
-#     for t in range(time):
-#         for i in range(int(areaDims.x)):
-#             for j in range(int(areaDims.y)):
-#                 if i == constants.ORIGIN.x and j == constants.ORIGIN.y:
-#                     continue
-#                 if t in area[i][j]:
-#                     dronesUp += 1
-#     return 1 - dronesUp / (time * (1 + constants.))
-
-
 class EvaluatorModules(Enum):
     COVERAGE = "Coverage"
     COLLISION = "Collision"
@@ -210,13 +210,14 @@ class EvaluatorModules(Enum):
     POIS = "POIS"
     UPTIME = "Uptime"
     OUTOFBOUND = "OutOfBound"
+    BATTERY = "Battery"
 
 
 def evaluate(
     grid: list[list[ACTION]], activeModules: list[EvaluatorModules] | None = None
 ):
     gridDimensions = constants.DIM
-    area, oob_dist, oob_time = populateArea(grid, gridDimensions)
+    area, oob_dist, oob_time, batteryEvaluation = populateArea(grid, gridDimensions)
     if activeModules is None:
         evaluators = {
             "Coverage": evaluateCoverageArea,
@@ -242,6 +243,8 @@ def evaluate(
             evaluators["OutOfBound"] = (
                 lambda _, __, ___: ((oob_dist + oob_time) / 2) ** 2
             )
+        if EvaluatorModules.BATTERY in activeModules:
+            evaluators["Battery"] = lambda _, __, ___: batteryEvaluation
     evaluateMetric = lambda eval: eval(area, grid, gridDimensions)
     results = {metric: evaluateMetric(eval) for metric, eval in evaluators.items()}
     accumulator = 0
