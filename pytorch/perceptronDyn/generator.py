@@ -39,8 +39,6 @@ def train_generator(
 
     evalWeight, regularWeight = WeightApproach.get_instance().get_weights(epoch)
 
-    print(f"evalWeight: {evalWeight}, regularWeight: {regularWeight}")
-
     loss_fun = CustomLoss(eval_tensor, evalWeight, regularWeight)
     loss = loss_fun(output, real_label)
     loss.backward()
