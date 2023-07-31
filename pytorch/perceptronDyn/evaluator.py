@@ -84,7 +84,8 @@ def populateArea(
             # we need to penalize it, we want to make it 0 if the battery became more negative than -constants.BATTERY_CAPACITY/3
             ooBatteryPenalization = 3/ constants.BATTERY_CAPACITY
             if uav_battery[uav] <= 0:
-                ooBattery[uav] -= ooBatteryPenalization 
+                if(ooBattery[uav] > 0):
+                    ooBattery[uav] -= ooBatteryPenalization 
             how_far_x = min(currentPos[uav].x, areaDims.x - currentPos[uav].x - 1)
             how_far_y = min(currentPos[uav].y, areaDims.y - currentPos[uav].y - 1)
             if how_far_x < 0 or how_far_y < 0:
