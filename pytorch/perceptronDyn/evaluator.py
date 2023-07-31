@@ -75,17 +75,29 @@ def populateArea(
                 currentPos[uav].x = currentPos[uav].x + 1
             # If it is in the origin and the action is STAY, it charges the battery
             # We have to take into account that the battery charges from 0 to constants.BATTERY_CAPACITY in constants.TIME_TO_CHARGE
-            if currentPos[uav].x == constants.ORIGIN.x and currentPos[uav].y == constants.ORIGIN.y and chosenMove == ACTION.STAY and uav_battery[uav] < constants.BATTERY_CAPACITY:
-                uav_battery[uav] += ( constants.BATTERY_CAPACITY / constants.TIME_TO_CHARGE)
+            if (
+                currentPos[uav].x == constants.ORIGIN.x
+                and currentPos[uav].y == constants.ORIGIN.y
+                and chosenMove == ACTION.STAY
+                and uav_battery[uav] < constants.BATTERY_CAPACITY
+            ):
+                uav_battery[uav] += (
+                    constants.BATTERY_CAPACITY / constants.TIME_TO_CHARGE
+                )
             # If it is not in the origin it uses battery
-            elif currentPos[uav].x != constants.ORIGIN.x or currentPos[uav].y != constants.ORIGIN.y:
+            elif (
+                currentPos[uav].x != constants.ORIGIN.x
+                or currentPos[uav].y != constants.ORIGIN.y
+            ):
                 uav_battery[uav] -= 1
             # If the battery is 0 or less, it is out of battery
             # we need to penalize it, we want to make it 0 if the battery became more negative than -constants.BATTERY_CAPACITY/3
-            ooBatteryPenalization = 3/ constants.BATTERY_CAPACITY
+            ooBatteryPenalization = 3 / constants.BATTERY_CAPACITY
             if uav_battery[uav] <= 0:
-                if(ooBattery[uav] > 0):
-                    ooBattery[uav] -= ooBatteryPenalization 
+                if ooBattery[uav] > 0:
+                    ooBattery[uav] -= ooBatteryPenalization
+                    if ooBattery[uav] < 0:
+                        ooBattery[uav] = 0
             how_far_x = min(currentPos[uav].x, areaDims.x - currentPos[uav].x - 1)
             how_far_y = min(currentPos[uav].y, areaDims.y - currentPos[uav].y - 1)
             if how_far_x < 0 or how_far_y < 0:
@@ -101,7 +113,12 @@ def populateArea(
         if pen < max_pen:
             max_pen = pen
     max_pen = -max_pen / ((total_time + 1) * total_time)
-    return res, 1 - max_pen, 1 - time_oob / (num_uavs * total_time), sum(ooBattery) / (num_uavs)
+    return (
+        res,
+        1 - max_pen,
+        1 - time_oob / (num_uavs * total_time),
+        sum(ooBattery) / (num_uavs),
+    )
 
 
 def get_duplicates(array):
@@ -204,6 +221,7 @@ def evaluateDroneUpTime(
                     break
     return dronesUp / time
 
+
 class EvaluatorModules(Enum):
     COVERAGE = "Coverage"
     COLLISION = "Collision"
@@ -267,13 +285,13 @@ def evaluateGAN(
     return evaluate(parsedList, activeModules)
 
 
-def evaluate_file(file: str,  activeModules: list[EvaluatorModules] | None = None):
+def evaluate_file(file: str, activeModules: list[EvaluatorModules] | None = None):
     with open(file, "r") as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]
     lines = [line.split(" ") for line in lines]
     lines = [[int(x) for x in line] for line in lines]
-    return evaluateGAN(lines,activeModules)
+    return evaluateGAN(lines, activeModules)
 
 
 if __name__ == "__main__":
