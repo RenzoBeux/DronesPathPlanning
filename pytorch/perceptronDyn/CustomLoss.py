@@ -14,7 +14,12 @@ class CustomLoss(nn.Module):
     def forward(self, predictions, targets):
         # Use BCELoss to calculate the loss
         reg = self.regularWeight * nn.BCELoss()(predictions, targets)
-
+        # Lets check all evaluations are between 0 and 1 if they are not show a warning
+        # with the value of the evaluation
+        if torch.any(self.evaluations < 0) or torch.any(self.evaluations > 1):
+            print("Warning: Evaluation outside of bounds")
+            print(self.evaluations)
+            
         evaluation = self.evalWeight * nn.BCELoss()(self.evaluations,
                                                     torch.ones(self.evaluations.size(0)).to(
                                                         constants.device))
