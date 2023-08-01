@@ -35,6 +35,7 @@ print(f"EPOCHS: {constants.EPOCHS}")
 print(f"g_learn_rate: {constants.g_learn_rate}")
 print(f"d_learn_rate: {constants.d_learn_rate}")
 print(f"Weight Approach: {constants.weightApproach}")
+print(f"Evaluator Approach: {constants.evaluatorModuleApproach}")
 
 # Instantiate the generator and discriminator networks
 generator = Generator(constants.NOISE_DIM).to(constants.device)

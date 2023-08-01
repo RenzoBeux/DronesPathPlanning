@@ -86,12 +86,17 @@ class EvaluatorModuleApproach:
     def __constant(self, epoch):
         from evaluator import EvaluatorModules
 
-        return [EvaluatorModules.OUTOFBOUND, EvaluatorModules.COVERAGE]
+        return [EvaluatorModules.OUTOFBOUND, EvaluatorModules.BATTERY]
 
     def __linear(self, epoch):
         from evaluator import EvaluatorModules
 
+        flag = False
+
         if epoch < self.EPOCHS / 2:
             return [EvaluatorModules.OUTOFBOUND]
         else:
-            return [EvaluatorModules.OUTOFBOUND, EvaluatorModules.COVERAGE]
+            if flag == False:
+                flag = True
+                print("BATTERY is added")
+            return [EvaluatorModules.OUTOFBOUND, EvaluatorModules.BATTERY]
