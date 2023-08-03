@@ -91,12 +91,7 @@ class EvaluatorModuleApproach:
     def __linear(self, epoch):
         from evaluator import EvaluatorModules
 
-        flag = False
-
         if epoch < self.EPOCHS / 2:
             return [EvaluatorModules.OUTOFBOUND]
         else:
-            if flag == False:
-                flag = True
-                print("BATTERY is added")
             return [EvaluatorModules.OUTOFBOUND, EvaluatorModules.BATTERY]
